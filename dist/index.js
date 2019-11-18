@@ -1319,6 +1319,20 @@ module.exports = invariant;
 
 /***/ }),
 
+/***/ "./node_modules/isarray/index.js":
+/*!***************************************!*\
+  !*** ./node_modules/isarray/index.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/mini-create-react-context/dist/esm/index.js":
 /*!******************************************************************!*\
   !*** ./node_modules/mini-create-react-context/dist/esm/index.js ***!
@@ -2756,9 +2770,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_is__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-is */ "./node_modules/react-is/index.js");
 /* harmony import */ var react_is__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_is__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _utils_Subscription__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/Subscription */ "./node_modules/react-redux/es/utils/Subscription.js");
-/* harmony import */ var _utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../utils/useIsomorphicLayoutEffect */ "./node_modules/react-redux/es/utils/useIsomorphicLayoutEffect.js");
-/* harmony import */ var _Context__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Context */ "./node_modules/react-redux/es/components/Context.js");
-
+/* harmony import */ var _Context__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Context */ "./node_modules/react-redux/es/components/Context.js");
 
 
 
@@ -2786,20 +2798,26 @@ function storeStateUpdatesReducer(state, action) {
 
 var initStateUpdates = function initStateUpdates() {
   return [null, 0];
-};
+}; // React currently throws a warning when using useLayoutEffect on the server.
+// To get around it, we can conditionally useEffect on the server (no-op) and
+// useLayoutEffect in the browser. We need useLayoutEffect because we want
+// `connect` to perform sync updates to a ref to save the latest props after
+// a render is actually committed to the DOM.
 
+
+var useIsomorphicLayoutEffect = typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.createElement !== 'undefined' ? react__WEBPACK_IMPORTED_MODULE_4__["useLayoutEffect"] : react__WEBPACK_IMPORTED_MODULE_4__["useEffect"];
 function connectAdvanced(
 /*
   selectorFactory is a func that is responsible for returning the selector function used to
   compute new props from state, props, and dispatch. For example:
-      export default connectAdvanced((dispatch, options) => (state, props) => ({
+     export default connectAdvanced((dispatch, options) => (state, props) => ({
       thing: state.things[props.thingId],
       saveThing: fields => dispatch(actionCreators.saveThing(props.thingId, fields)),
     }))(YourComponent)
-    Access to dispatch is provided to the factory so selectorFactories can bind actionCreators
+   Access to dispatch is provided to the factory so selectorFactories can bind actionCreators
   outside of their selector as an optimization. Options passed to connectAdvanced are passed to
   the selectorFactory, along with displayName and WrappedComponent, as the second argument.
-    Note that selectorFactory is responsible for all caching/memoization of inbound and outbound
+   Note that selectorFactory is responsible for all caching/memoization of inbound and outbound
   props. Do not use connectAdvanced directly without memoizing results between calls to your
   selector, otherwise the Connect component will re-render on every state or props change.
 */
@@ -2827,7 +2845,7 @@ _ref) {
       _ref2$forwardRef = _ref2.forwardRef,
       forwardRef = _ref2$forwardRef === void 0 ? false : _ref2$forwardRef,
       _ref2$context = _ref2.context,
-      context = _ref2$context === void 0 ? _Context__WEBPACK_IMPORTED_MODULE_8__["ReactReduxContext"] : _ref2$context,
+      context = _ref2$context === void 0 ? _Context__WEBPACK_IMPORTED_MODULE_7__["ReactReduxContext"] : _ref2$context,
       connectOptions = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_1__["default"])(_ref2, ["getDisplayName", "methodName", "renderCountProp", "shouldHandleStateChanges", "storeKey", "withRef", "forwardRef", "context"]);
 
   invariant__WEBPACK_IMPORTED_MODULE_3___default()(renderCountProp === undefined, "renderCountProp is removed. render counting is built into the latest React Dev Tools profiling extension");
@@ -2887,15 +2905,12 @@ _ref) {
         return propsContext && propsContext.Consumer && Object(react_is__WEBPACK_IMPORTED_MODULE_5__["isContextConsumer"])(react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(propsContext.Consumer, null)) ? propsContext : Context;
       }, [propsContext, Context]); // Retrieve the store and ancestor subscription via context, if available
 
-      var contextValue = Object(react__WEBPACK_IMPORTED_MODULE_4__["useContext"])(ContextToUse); // The store _must_ exist as either a prop or in context.
-      // We'll check to see if it _looks_ like a Redux store first.
-      // This allows us to pass through a `store` prop that is just a plain value.
+      var contextValue = Object(react__WEBPACK_IMPORTED_MODULE_4__["useContext"])(ContextToUse); // The store _must_ exist as either a prop or in context
 
-      var didStoreComeFromProps = Boolean(props.store) && Boolean(props.store.getState) && Boolean(props.store.dispatch);
+      var didStoreComeFromProps = Boolean(props.store);
       var didStoreComeFromContext = Boolean(contextValue) && Boolean(contextValue.store);
-      invariant__WEBPACK_IMPORTED_MODULE_3___default()(didStoreComeFromProps || didStoreComeFromContext, "Could not find \"store\" in the context of " + ("\"" + displayName + "\". Either wrap the root component in a <Provider>, ") + "or pass a custom React context provider to <Provider> and the corresponding " + ("React context consumer to " + displayName + " in connect options.")); // Based on the previous check, one of these must be true
-
-      var store = didStoreComeFromProps ? props.store : contextValue.store;
+      invariant__WEBPACK_IMPORTED_MODULE_3___default()(didStoreComeFromProps || didStoreComeFromContext, "Could not find \"store\" in the context of " + ("\"" + displayName + "\". Either wrap the root component in a <Provider>, ") + "or pass a custom React context provider to <Provider> and the corresponding " + ("React context consumer to " + displayName + " in connect options."));
+      var store = props.store || contextValue.store;
       var childPropsSelector = Object(react__WEBPACK_IMPORTED_MODULE_4__["useMemo"])(function () {
         // The child props selector needs the store reference as an input.
         // Re-create this selector whenever the store changes.
@@ -2970,7 +2985,7 @@ _ref) {
       // about useLayoutEffect in SSR, so we try to detect environment and fall back to
       // just useEffect instead to avoid the warning, since neither will run anyway.
 
-      Object(_utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_7__["useIsomorphicLayoutEffect"])(function () {
+      useIsomorphicLayoutEffect(function () {
         // We want to capture the wrapper props and child props we used for later comparisons
         lastWrapperProps.current = wrapperProps;
         lastChildProps.current = actualChildProps;
@@ -2982,7 +2997,7 @@ _ref) {
         }
       }); // Our re-subscribe logic only runs when the store/subscription setup changes
 
-      Object(_utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_7__["useIsomorphicLayoutEffect"])(function () {
+      useIsomorphicLayoutEffect(function () {
         // If we're not subscribed to the store, nothing to do here
         if (!shouldHandleStateChanges) return; // Capture values for checking if and when this component unmounts
 
@@ -3029,6 +3044,7 @@ _ref) {
             forceComponentUpdateDispatch({
               type: 'STORE_UPDATED',
               payload: {
+                latestStoreState: latestStoreState,
                 error: error
               }
             });
@@ -3672,14 +3688,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var invariant__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(invariant__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _useReduxContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./useReduxContext */ "./node_modules/react-redux/es/hooks/useReduxContext.js");
 /* harmony import */ var _utils_Subscription__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Subscription */ "./node_modules/react-redux/es/utils/Subscription.js");
-/* harmony import */ var _utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/useIsomorphicLayoutEffect */ "./node_modules/react-redux/es/utils/useIsomorphicLayoutEffect.js");
-/* harmony import */ var _components_Context__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/Context */ "./node_modules/react-redux/es/components/Context.js");
+/* harmony import */ var _components_Context__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/Context */ "./node_modules/react-redux/es/components/Context.js");
 
 
 
 
+ // React currently throws a warning when using useLayoutEffect on the server.
+// To get around it, we can conditionally useEffect on the server (no-op) and
+// useLayoutEffect in the browser. We need useLayoutEffect to ensure the store
+// subscription callback always has the selector from the latest render commit
+// available, otherwise a store update may happen between render and the effect,
+// which may cause missed updates; we also must ensure the store subscription
+// is created synchronously, otherwise a store update may occur before the
+// subscription is created and an inconsistent state may be observed
 
-
+var useIsomorphicLayoutEffect = typeof window !== 'undefined' ? react__WEBPACK_IMPORTED_MODULE_0__["useLayoutEffect"] : react__WEBPACK_IMPORTED_MODULE_0__["useEffect"];
 
 var refEquality = function refEquality(a, b) {
   return a === b;
@@ -3706,7 +3729,7 @@ function useSelectorWithStoreAndSubscription(selector, equalityFn, store, contex
       selectedState = latestSelectedState.current;
     }
   } catch (err) {
-    var errorMessage = "An error occurred while selecting the store state: " + err.message + ".";
+    var errorMessage = "An error occured while selecting the store state: " + err.message + ".";
 
     if (latestSubscriptionCallbackError.current) {
       errorMessage += "\nThe error may be correlated with this previous error:\n" + latestSubscriptionCallbackError.current.stack + "\n\nOriginal stack trace:";
@@ -3715,12 +3738,12 @@ function useSelectorWithStoreAndSubscription(selector, equalityFn, store, contex
     throw new Error(errorMessage);
   }
 
-  Object(_utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_4__["useIsomorphicLayoutEffect"])(function () {
+  useIsomorphicLayoutEffect(function () {
     latestSelector.current = selector;
     latestSelectedState.current = selectedState;
     latestSubscriptionCallbackError.current = undefined;
   });
-  Object(_utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_4__["useIsomorphicLayoutEffect"])(function () {
+  useIsomorphicLayoutEffect(function () {
     function checkForUpdates() {
       try {
         var newSelectedState = latestSelector.current(store.getState());
@@ -3760,10 +3783,10 @@ function useSelectorWithStoreAndSubscription(selector, equalityFn, store, contex
 
 function createSelectorHook(context) {
   if (context === void 0) {
-    context = _components_Context__WEBPACK_IMPORTED_MODULE_5__["ReactReduxContext"];
+    context = _components_Context__WEBPACK_IMPORTED_MODULE_4__["ReactReduxContext"];
   }
 
-  var useReduxContext = context === _components_Context__WEBPACK_IMPORTED_MODULE_5__["ReactReduxContext"] ? _useReduxContext__WEBPACK_IMPORTED_MODULE_2__["useReduxContext"] : function () {
+  var useReduxContext = context === _components_Context__WEBPACK_IMPORTED_MODULE_4__["ReactReduxContext"] ? _useReduxContext__WEBPACK_IMPORTED_MODULE_2__["useReduxContext"] : function () {
     return Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(context);
   };
   return function useSelector(selector, equalityFn) {
@@ -4154,32 +4177,6 @@ function shallowEqual(objA, objB) {
 
 /***/ }),
 
-/***/ "./node_modules/react-redux/es/utils/useIsomorphicLayoutEffect.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/react-redux/es/utils/useIsomorphicLayoutEffect.js ***!
-  \************************************************************************/
-/*! exports provided: useIsomorphicLayoutEffect */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useIsomorphicLayoutEffect", function() { return useIsomorphicLayoutEffect; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
- // React currently throws a warning when using useLayoutEffect on the server.
-// To get around it, we can conditionally useEffect on the server (no-op) and
-// useLayoutEffect in the browser. We need useLayoutEffect to ensure the store
-// subscription callback always has the selector from the latest render commit
-// available, otherwise a store update may happen between render and the effect,
-// which may cause missed updates; we also must ensure the store subscription
-// is created synchronously, otherwise a store update may occur before the
-// subscription is created and an inconsistent state may be observed
-
-var isHopefullyDomEnvironment = typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.createElement !== 'undefined';
-var useIsomorphicLayoutEffect = isHopefullyDomEnvironment ? react__WEBPACK_IMPORTED_MODULE_0__["useLayoutEffect"] : react__WEBPACK_IMPORTED_MODULE_0__["useEffect"];
-
-/***/ }),
-
 /***/ "./node_modules/react-redux/es/utils/verifyPlainObject.js":
 /*!****************************************************************!*\
   !*** ./node_modules/react-redux/es/utils/verifyPlainObject.js ***!
@@ -4243,7 +4240,7 @@ function warning(message) {
 /*!***************************************************************!*\
   !*** ./node_modules/react-router-dom/esm/react-router-dom.js ***!
   \***************************************************************/
-/*! exports provided: MemoryRouter, Prompt, Redirect, Route, Router, StaticRouter, Switch, __RouterContext, generatePath, matchPath, useHistory, useLocation, useParams, useRouteMatch, withRouter, BrowserRouter, HashRouter, Link, NavLink */
+/*! exports provided: BrowserRouter, HashRouter, Link, NavLink, MemoryRouter, Prompt, Redirect, Route, Router, StaticRouter, Switch, __RouterContext, generatePath, matchPath, useHistory, useLocation, useParams, useRouteMatch, withRouter */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5406,20 +5403,6 @@ if (true) {
 
 /***/ }),
 
-/***/ "./node_modules/react-router/node_modules/isarray/index.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/react-router/node_modules/isarray/index.js ***!
-  \*****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
-};
-
-
-/***/ }),
-
 /***/ "./node_modules/react-router/node_modules/path-to-regexp/index.js":
 /*!************************************************************************!*\
   !*** ./node_modules/react-router/node_modules/path-to-regexp/index.js ***!
@@ -5427,7 +5410,7 @@ module.exports = Array.isArray || function (arr) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isarray = __webpack_require__(/*! isarray */ "./node_modules/react-router/node_modules/isarray/index.js")
+var isarray = __webpack_require__(/*! isarray */ "./node_modules/isarray/index.js")
 
 /**
  * Expose `pathToRegexp`.
@@ -6943,22 +6926,7 @@ var StmCommands;
     StmCommands["SetBlueMachine"] = "b";
 })(StmCommands = exports.StmCommands || (exports.StmCommands = {}));
 /*
-#define DIFFUSOR07 365
-#define DIFFUSOR06 375
-#define ACTIVEDIFFUSOR DIFFUSOR06
-uint16_t koefVarG1 = ACTIVEDIFFUSOR;
-uint16_t koefVarG2 = ACTIVEDIFFUSOR;
-if (needG1Mla1 > 0) {
-                    if ( (variomsCount[0]*100) / koefVarG1 >= needG1Mla1){
-                        DoButton3();
-                    }
-                }
-                if (needG1Mla2 > 0) {
-                    if ( (variomsCount[0]*100) / koefVarG1 >= needG1Mla2){
-                        DoButton4();
-                    }
-                }
-            }*/
+*/
 var TempratureData = [4331, 4281, 4232, 4225, 4218, 4211, 4204, 4197, 4190, 4183, 4176,
     4467, 4348, 4229, 4107, 4085, 4063, 4040, 4018, 3996, 3971, 3946,
     3863, 3780, 3698, 3710, 3673, 3640, 3606, 3573, 3539, 3506, 3472,
@@ -6995,6 +6963,21 @@ var Converter = {
             }
         }
         return 150;
+    },
+    volumetric: function (value) {
+        if (value === 1) {
+            return 1;
+        }
+        var DIFFUSOR07 = 365;
+        //#define DIFFUSOR06 375
+        //#define ACTIVEDIFFUSOR DIFFUSOR06
+        return Math.round((value * 100) / DIFFUSOR07);
+    },
+    compressure: function (value) {
+        if (value < 750) {
+            return 0;
+        }
+        return (value - 750) / 2;
     }
 };
 exports.default = Converter;
@@ -7131,6 +7114,8 @@ var Admin = function (props) {
             React.createElement("br", null),
             "\u0422\u0435\u043D \u043F\u0430\u0440\u0430: ",
             props.machine[Converter_1.StmMessages.Relay1],
+            " \u0438 ",
+            props.machine[Converter_1.StmMessages.Relay2],
             " ",
             React.createElement("br", null),
             "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u0432 \u043F\u0440\u0435\u0434\u043D\u0430\u0433\u0440\u0435\u0432\u0435: ",
@@ -7138,7 +7123,7 @@ var Admin = function (props) {
             " ",
             React.createElement("br", null),
             "\u0422\u0435\u043D \u043F\u0440\u0435\u0434\u043D\u0430\u0433\u0440\u0435\u0432\u0430: ",
-            props.machine[Converter_1.StmMessages.Relay2]),
+            props.machine[Converter_1.StmMessages.Relay3]),
         React.createElement("div", { className: 'manager-panel__block btn-outline-dark admin__text' },
             React.createElement("div", { className: 'admin__buttons' },
                 React.createElement("div", { className: "admin__button" + (props.machine[Converter_1.StmMessages.Button1] === '1' ? " admin__button_active" : "") }, "B1"),
@@ -7236,43 +7221,107 @@ var index_1 = __importDefault(__webpack_require__(/*! ../../SettingsStore/index 
 var index_2 = __webpack_require__(/*! ../../actions/index */ "./src/actions/index.ts");
 var ColorHotView = function (props) {
     return (React.createElement("div", { className: "setting__profile-parameters panel_root" },
-        React.createElement("div", { className: "manager-panel__block manager-panel__top" },
-            React.createElement("p", null, "\u041A\u0440\u0430\u0441\u043D\u044B\u0439(\u043D\u0430\u0433\u0440\u0435\u0442\u0430\u044F \u043C\u0430\u0448\u0438\u043D\u0430)"),
-            React.createElement(NumberInput_1.default, { increment: function (value) {
-                    index_1.default.dispatch(index_2.setSetting({
-                        id: 'RedHot',
-                        content: "" + (value + 1)
-                    }));
-                }, decrement: function (value) {
-                    index_1.default.dispatch(index_2.setSetting({
-                        id: 'RedHot',
-                        content: "" + (value - 1)
-                    }));
-                }, value: Number(props.settings.RedHot) || 0 }),
-            React.createElement("p", null, "\u0417\u0435\u043B\u0435\u043D\u044B\u0439(\u043D\u0430\u0433\u0440\u0435\u0442\u0430\u044F \u043C\u0430\u0448\u0438\u043D\u0430)"),
-            React.createElement(NumberInput_1.default, { increment: function (value) {
-                    index_1.default.dispatch(index_2.setSetting({
-                        id: 'GreenHot',
-                        content: "" + (value + 1)
-                    }));
-                }, decrement: function (value) {
-                    index_1.default.dispatch(index_2.setSetting({
-                        id: 'GreenHot',
-                        content: "" + (value - 1)
-                    }));
-                }, value: Number(props.settings.GreenHot) || 0 }),
-            React.createElement("p", null, "\u0421\u0438\u043D\u0438\u0439(\u043D\u0430\u0433\u0440\u0435\u0442\u0430\u044F \u043C\u0430\u0448\u0438\u043D\u0430)"),
-            React.createElement(NumberInput_1.default, { increment: function (value) {
-                    index_1.default.dispatch(index_2.setSetting({
-                        id: 'BlueHot',
-                        content: "" + (value + 1)
-                    }));
-                }, decrement: function (value) {
-                    index_1.default.dispatch(index_2.setSetting({
-                        id: 'BlueHot',
-                        content: "" + (value - 1)
-                    }));
-                }, value: Number(props.settings.BlueHot) || 0 })),
+        React.createElement("div", { className: "setting__profile-parameters__color manager-panel__block manager-panel__top" },
+            React.createElement("div", { className: "manager-panel__block" },
+                React.createElement("p", null, "\u0425\u043E\u043B\u043E\u0434\u043D\u0430\u044F \u043C\u0430\u0448\u0438\u043D\u0430"),
+                React.createElement("p", null, "\u041A\u0440\u0430\u0441\u043D\u044B\u0439"),
+                React.createElement(NumberInput_1.default, { increment: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'RedCold',
+                            content: "" + (value + 1)
+                        }));
+                    }, decrement: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'RedCold',
+                            content: "" + (value - 1)
+                        }));
+                    }, value: Number(props.settings.RedCold) || 0 }),
+                React.createElement("p", null, "\u0417\u0435\u043B\u0435\u043D\u044B\u0439"),
+                React.createElement(NumberInput_1.default, { increment: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'GreenCold',
+                            content: "" + (value + 1)
+                        }));
+                    }, decrement: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'GreenCold',
+                            content: "" + (value - 1)
+                        }));
+                    }, value: Number(props.settings.GreenCold) || 0 }),
+                React.createElement("p", null, "\u0421\u0438\u043D\u0438\u0439"),
+                React.createElement(NumberInput_1.default, { increment: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'BlueCold',
+                            content: "" + (value + 1)
+                        }));
+                    }, decrement: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'BlueCold',
+                            content: "" + (value - 1)
+                        }));
+                    }, value: Number(props.settings.BlueCold) || 0 }),
+                React.createElement("p", null, "\u0410\u043B\u044C\u0444\u0430"),
+                React.createElement(NumberInput_1.default, { increment: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'AlphaCold',
+                            content: "" + (value + 1)
+                        }));
+                    }, decrement: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'AlphaCold',
+                            content: "" + (value - 1)
+                        }));
+                    }, value: Number(props.settings.AlphaCold) || 0 })),
+            React.createElement("div", { className: "manager-panel__block" },
+                React.createElement("p", null, "\u041D\u0430\u0433\u0440\u0435\u0442\u0430\u044F \u043C\u0430\u0448\u0438\u043D\u0430"),
+                React.createElement("p", null, "\u041A\u0440\u0430\u0441\u043D\u044B\u0439"),
+                React.createElement(NumberInput_1.default, { increment: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'RedHot',
+                            content: "" + (value + 1)
+                        }));
+                    }, decrement: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'RedHot',
+                            content: "" + (value - 1)
+                        }));
+                    }, value: Number(props.settings.RedHot) || 0 }),
+                React.createElement("p", null, "\u0417\u0435\u043B\u0435\u043D\u044B\u0439"),
+                React.createElement(NumberInput_1.default, { increment: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'GreenHot',
+                            content: "" + (value + 1)
+                        }));
+                    }, decrement: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'GreenHot',
+                            content: "" + (value - 1)
+                        }));
+                    }, value: Number(props.settings.GreenHot) || 0 }),
+                React.createElement("p", null, "\u0421\u0438\u043D\u0438\u0439"),
+                React.createElement(NumberInput_1.default, { increment: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'BlueHot',
+                            content: "" + (value + 1)
+                        }));
+                    }, decrement: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'BlueHot',
+                            content: "" + (value - 1)
+                        }));
+                    }, value: Number(props.settings.BlueHot) || 0 }),
+                React.createElement("p", null, "\u0410\u043B\u044C\u0444\u0430"),
+                React.createElement(NumberInput_1.default, { increment: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'AlphaHot',
+                            content: "" + (value + 1)
+                        }));
+                    }, decrement: function (value) {
+                        index_1.default.dispatch(index_2.setSetting({
+                            id: 'AlphaHot',
+                            content: "" + (value - 1)
+                        }));
+                    }, value: Number(props.settings.AlphaHot) || 0 }))),
         React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block manager-panel__bottom" }, "\u041D\u0430\u0437\u0430\u0434")));
 };
 exports.default = ColorHotView;
@@ -7299,13 +7348,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __importStar(__webpack_require__(/*! react */ "react"));
 function NumberInput(props) {
-    return React.createElement("div", { className: 'setting__input' },
-        React.createElement("button", { onClick: function () { return props.decrement(props.value); }, className: 'btn-outline-dark setting__inputButton' }, "-"),
-        React.createElement("span", { className: 'setting__inputValue' }, props.value),
-        React.createElement("button", { onClick: function () { return props.increment(props.value); }, className: 'btn-outline-dark setting__inputButton' }, "+"));
+    var _a = React.useState(0), startInc = _a[0], setStartInc = _a[1];
+    var _b = React.useState(0), startDec = _b[0], setStartDec = _b[1];
+    React.useEffect(function () {
+        if (startInc) {
+            setTimeout(function () {
+                props.increment(props.value);
+            }, 100);
+        }
+        if (startDec) {
+            setTimeout(function () {
+                props.decrement(props.value);
+            }, 100);
+        }
+    });
+    return (React.createElement("div", { className: "setting__input" },
+        React.createElement("button", { onMouseDown: function () { return setStartDec(1); }, onMouseUp: function () { return setStartDec(0); }, onMouseLeave: function () { return setStartDec(0); }, className: "btn-outline-dark setting__inputButton" }, "-"),
+        React.createElement("span", { className: "setting__inputValue" }, props.value),
+        React.createElement("button", { onMouseDown: function () { return setStartInc(1); }, onMouseUp: function () { return setStartInc(0); }, onMouseLeave: function () { return setStartInc(0); }, className: "btn-outline-dark setting__inputButton" }, "+")));
 }
 exports.default = NumberInput;
-;
 
 
 /***/ }),
@@ -7350,8 +7412,12 @@ var Profile_1 = __importDefault(__webpack_require__(/*! ./Profile */ "./src/Mana
 var Update_1 = __importDefault(__webpack_require__(/*! ./Update */ "./src/ManagerPanel/Update.tsx"));
 var ParametersSettings_1 = __importDefault(__webpack_require__(/*! ./ParametersSettings */ "./src/ManagerPanel/ParametersSettings.tsx"));
 var Steam_1 = __importDefault(__webpack_require__(/*! ./Parameters/Steam */ "./src/ManagerPanel/Parameters/Steam.tsx"));
+var GroupTemperature_1 = __importDefault(__webpack_require__(/*! ./Parameters/GroupTemperature */ "./src/ManagerPanel/Parameters/GroupTemperature.tsx"));
 var ColorHot_1 = __importDefault(__webpack_require__(/*! ./Colors/ColorHot */ "./src/ManagerPanel/Colors/ColorHot.tsx"));
 var Admin_1 = __importDefault(__webpack_require__(/*! ./Admin */ "./src/ManagerPanel/Admin.tsx"));
+var PreSoaking_1 = __importDefault(__webpack_require__(/*! ./Parameters/PreSoaking */ "./src/ManagerPanel/Parameters/PreSoaking.tsx"));
+var AutoMode_1 = __importDefault(__webpack_require__(/*! ./Parameters/AutoMode */ "./src/ManagerPanel/Parameters/AutoMode.tsx"));
+var Predict_1 = __importDefault(__webpack_require__(/*! ./Parameters/Predict */ "./src/ManagerPanel/Parameters/Predict.tsx"));
 function Panel() {
     return (React.createElement(React.Fragment, null,
         React.createElement(react_router_dom_1.Route, { exact: true, path: "/", component: Root_1.default }),
@@ -7361,9 +7427,338 @@ function Panel() {
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/color", component: ColorHot_1.default }),
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/update", component: Update_1.default }),
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand", component: ParametersSettings_1.default }),
-        React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand/steam", component: Steam_1.default })));
+        React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand/steam", component: Steam_1.default }),
+        React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand/temp", component: GroupTemperature_1.default }),
+        React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand/soaking", component: PreSoaking_1.default }),
+        React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand/automode", component: AutoMode_1.default }),
+        React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand/predict", component: Predict_1.default })));
 }
 exports.Panel = Panel;
+
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/Parameters/AutoMode.tsx":
+/*!**************************************************!*\
+  !*** ./src/ManagerPanel/Parameters/AutoMode.tsx ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_router_dom_1 = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+var React = __importStar(__webpack_require__(/*! react */ "react"));
+var types_1 = __webpack_require__(/*! ../../types */ "./src/types.ts");
+var NumberInput_1 = __importDefault(__webpack_require__(/*! ../NumberInput */ "./src/ManagerPanel/NumberInput.tsx"));
+var index_1 = __importDefault(__webpack_require__(/*! ../../SettingsStore/index */ "./src/SettingsStore/index.ts"));
+var index_2 = __webpack_require__(/*! ../../actions/index */ "./src/actions/index.ts");
+var react_redux_1 = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+var AutoMode = function (props) {
+    var value1 = Number(props.settings.Group1AutoMode1) || 0;
+    var value2 = Number(props.settings.Group2AutoMode1) || 0;
+    return (React.createElement("div", { className: "setting__profile-parameters panel_root" },
+        React.createElement("div", { className: "manager-panel__block manager-panel__top" },
+            React.createElement("p", null, "\u0413\u0440\u0443\u043F\u043F\u0430 1: \u041E\u0431\u044A\u0435\u043C \u0432\u0430\u0440\u043A\u0438"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group1AutoMode1',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group1AutoMode1',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value1 }),
+            React.createElement("p", null, "\u0413\u0440\u0443\u043F\u043F\u0430 2: \u041E\u0431\u044A\u0435\u043C \u0432\u0430\u0440\u043A\u0438"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group2AutoMode1',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group2AutoMode1',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value2 })),
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block manager-panel__bottom" }, "\u041D\u0430\u0437\u0430\u0434")));
+};
+var mapStateToProps = function (state) {
+    return __assign({}, state);
+};
+var AutoModeConnected = react_redux_1.connect(mapStateToProps)(AutoMode);
+exports.default = AutoModeConnected;
+
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/Parameters/GroupTemperature.tsx":
+/*!**********************************************************!*\
+  !*** ./src/ManagerPanel/Parameters/GroupTemperature.tsx ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_router_dom_1 = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+var React = __importStar(__webpack_require__(/*! react */ "react"));
+var types_1 = __webpack_require__(/*! ../../types */ "./src/types.ts");
+var NumberInput_1 = __importDefault(__webpack_require__(/*! ../NumberInput */ "./src/ManagerPanel/NumberInput.tsx"));
+var index_1 = __importDefault(__webpack_require__(/*! ../../SettingsStore/index */ "./src/SettingsStore/index.ts"));
+var index_2 = __webpack_require__(/*! ../../actions/index */ "./src/actions/index.ts");
+var react_redux_1 = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+var GroupTemperature = function (props) {
+    var value = Number(props.settings.Group1Temperature) || 0;
+    var value2 = Number(props.settings.Group2Temperature) || 0;
+    return (React.createElement("div", { className: "setting__profile-parameters panel_root" },
+        React.createElement("div", { className: "manager-panel__block manager-panel__top" },
+            React.createElement("p", null, "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u0433\u0440\u0443\u043F\u043F\u044B 1"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group1Temperature',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group1Temperature',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value }),
+            React.createElement("p", null, "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u0433\u0440\u0443\u043F\u043F\u044B 2"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group2Temperature',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group2Temperature',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value2 })),
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block manager-panel__bottom" }, "\u041D\u0430\u0437\u0430\u0434")));
+};
+var mapStateToProps = function (state) {
+    return __assign({}, state);
+};
+var GroupTemperatureConnected = react_redux_1.connect(mapStateToProps)(GroupTemperature);
+exports.default = GroupTemperatureConnected;
+
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/Parameters/PreSoaking.tsx":
+/*!****************************************************!*\
+  !*** ./src/ManagerPanel/Parameters/PreSoaking.tsx ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_router_dom_1 = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+var React = __importStar(__webpack_require__(/*! react */ "react"));
+var types_1 = __webpack_require__(/*! ../../types */ "./src/types.ts");
+var NumberInput_1 = __importDefault(__webpack_require__(/*! ../NumberInput */ "./src/ManagerPanel/NumberInput.tsx"));
+var index_1 = __importDefault(__webpack_require__(/*! ../../SettingsStore/index */ "./src/SettingsStore/index.ts"));
+var index_2 = __webpack_require__(/*! ../../actions/index */ "./src/actions/index.ts");
+var react_redux_1 = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+var PreSoaking = function (props) {
+    var value1 = Number(props.settings.Group1Presoaking) || 0;
+    var value2 = Number(props.settings.Group1PostPresoaking) || 0;
+    var value3 = Number(props.settings.Group2Presoaking) || 0;
+    var value4 = Number(props.settings.Group2PostPresoaking) || 0;
+    return (React.createElement("div", { className: "setting__profile-parameters panel_root" },
+        React.createElement("div", { className: "manager-panel__block manager-panel__top" },
+            React.createElement("p", null, "\u0413\u0440\u0443\u043F\u043F\u0430 1: \u0412\u0440\u0435\u043C\u044F \u043F\u0440\u0435\u0434\u0441\u043C\u0430\u0447\u0438\u0432\u0430\u043D\u0438\u044F"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group1Presoaking',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group1Presoaking',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value1 }),
+            React.createElement("p", null, "\u0413\u0440\u0443\u043F\u043F\u0430 1: \u0412\u0440\u0435\u043C\u044F \u043F\u043E\u0441\u0442\u043F\u0440\u0435\u0434\u0441\u043C\u0430\u0447\u0438\u0432\u0430\u043D\u0438\u044F"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group1PostPresoaking',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group1PostPresoaking',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value2 }),
+            React.createElement("p", null, "\u0413\u0440\u0443\u043F\u043F\u0430 2: \u0412\u0440\u0435\u043C\u044F \u043F\u0440\u0435\u0434\u0441\u043C\u0430\u0447\u0438\u0432\u0430\u043D\u0438\u044F"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group2Presoaking',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group2Presoaking',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value3 }),
+            React.createElement("p", null, "\u0413\u0440\u0443\u043F\u043F\u0430 2: \u0412\u0440\u0435\u043C\u044F \u043F\u043E\u0441\u0442\u043F\u0440\u0435\u0434\u0441\u043C\u0430\u0447\u0438\u0432\u0430\u043D\u0438\u044F"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group2PostPresoaking',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'Group2PostPresoaking',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value4 })),
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block manager-panel__bottom" }, "\u041D\u0430\u0437\u0430\u0434")));
+};
+var mapStateToProps = function (state) {
+    return __assign({}, state);
+};
+var PreSoakingConnected = react_redux_1.connect(mapStateToProps)(PreSoaking);
+exports.default = PreSoakingConnected;
+
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/Parameters/Predict.tsx":
+/*!*************************************************!*\
+  !*** ./src/ManagerPanel/Parameters/Predict.tsx ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_router_dom_1 = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+var React = __importStar(__webpack_require__(/*! react */ "react"));
+var types_1 = __webpack_require__(/*! ../../types */ "./src/types.ts");
+var NumberInput_1 = __importDefault(__webpack_require__(/*! ../NumberInput */ "./src/ManagerPanel/NumberInput.tsx"));
+var index_1 = __importDefault(__webpack_require__(/*! ../../SettingsStore/index */ "./src/SettingsStore/index.ts"));
+var index_2 = __webpack_require__(/*! ../../actions/index */ "./src/actions/index.ts");
+var react_redux_1 = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+var Predict = function (props) {
+    var value1 = Number(props.settings.PredictTemperature) || 0;
+    return (React.createElement("div", { className: "setting__profile-parameters panel_root" },
+        React.createElement("div", { className: "manager-panel__block manager-panel__top" },
+            React.createElement("p", null, "\u0413\u0440\u0443\u043F\u043F\u0430 1: \u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u0432 \u043F\u0440\u0435\u0434\u043D\u0430\u0433\u0440\u0435\u0432\u0435"),
+            React.createElement(NumberInput_1.default, { increment: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'PredictTemperature',
+                        content: "" + (value + 1)
+                    }));
+                }, decrement: function (value) {
+                    index_1.default.dispatch(index_2.setSetting({
+                        id: 'PredictTemperature',
+                        content: "" + (value - 1)
+                    }));
+                }, value: value1 })),
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block manager-panel__bottom" }, "\u041D\u0430\u0437\u0430\u0434")));
+};
+var mapStateToProps = function (state) {
+    return __assign({}, state);
+};
+var PredictConnected = react_redux_1.connect(mapStateToProps)(Predict);
+exports.default = PredictConnected;
 
 
 /***/ }),
@@ -7437,12 +7832,12 @@ var SteamView = function (props) {
             React.createElement(NumberInput_1.default, { increment: function (value) {
                     index_1.default.dispatch(index_2.setSetting({
                         id: 'SteamPressure',
-                        content: "" + (value + 1)
+                        content: "" + Math.round((value + 0.1) * 10) / 10
                     }));
                 }, decrement: function (value) {
                     index_1.default.dispatch(index_2.setSetting({
                         id: 'SteamPressure',
-                        content: "" + (value - 1)
+                        content: "" + Math.round((value - 0.1) * 10) / 10
                     }));
                 }, value: value })),
         React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block manager-panel__bottom" }, "\u041D\u0430\u0437\u0430\u0434")));
@@ -7475,37 +7870,36 @@ var types_1 = __webpack_require__(/*! ../types */ "./src/types.ts");
 var Parameters = [
     {
         key: 0,
-        title: 'Паровой бойлер',
-        route: 'steam'
+        title: "Паровой бойлер",
+        route: "steam"
     },
     {
         key: 1,
-        title: 'Температуры группы',
-        route: 'steam'
+        title: "Температуры группы",
+        route: "temp"
     },
     {
         key: 2,
-        title: 'Предсмачивания',
-        route: 'steam'
+        title: "Предсмачивания",
+        route: "soaking"
     },
     {
         key: 3,
-        title: 'Время варки',
-        route: 'steam'
+        title: "Время варки",
+        route: "automode"
     },
     {
         key: 4,
-        title: 'Преднагревательный бойлер',
-        route: 'steam'
+        title: "Преднагревательный бойлер",
+        route: "predict"
     }
 ];
 function ParametersSettings() {
-    return (React.createElement("div", { className: 'setting__profile panel_root' },
-        React.createElement("ul", { className: 'setting__profile-list list-group list-group-flush' }, Parameters.map(function (el) {
-            return (React.createElement("li", { className: 'list-group-item', key: el.key },
-                React.createElement(react_router_dom_1.NavLink, { to: 'hand/steam', className: 'setting__hand-listItem' }, el.title)));
+    return (React.createElement("div", { className: "setting__profile panel_root" },
+        React.createElement("ul", { className: "setting__profile-list list-group list-group-flush" }, Parameters.map(function (el) {
+            return (React.createElement(react_router_dom_1.NavLink, { to: "hand/" + el.route, className: "setting__hand-listItem list-group-item", key: el.key }, el.title));
         })),
-        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block btn-outline-success' }, "\u041D\u0430\u0437\u0430\u0434")));
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block btn-outline-success" }, "\u041D\u0430\u0437\u0430\u0434")));
 }
 exports.default = ParametersSettings;
 
@@ -7577,7 +7971,7 @@ function ProfileView(opts) {
         React.createElement("ul", { className: 'setting__profile-list list-group list-group-flush' }, opts.profiles.map(function (el, key) {
             return (React.createElement("li", { onClick: function () {
                     index_1.default.dispatch(index_2.setProfile(el.title));
-                }, className: 'list-group-item', key: key }, el.title));
+                }, className: 'list-group-item' + (el.title === opts.choosenProfile ? ' list-group-item__selected' : ''), key: key }, el.title));
         })),
         React.createElement(react_router_dom_1.NavLink, { to: 'profile/hand', className: 'manager-panel__block btn-outline-dark' }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430 \u043F\u043E \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u0430\u043C"),
         React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block btn-outline-success' }, "\u041D\u0430\u0437\u0430\u0434")));
@@ -7886,11 +8280,13 @@ var Process = /** @class */ (function () {
         this.status = types_1.ProcessStatus.wip;
         this.errorTimeout = 0;
         this.wipTimeout = 0;
+        this.wipStart = 0;
         this.timeDone = 0;
         this.name = name;
         this.stateMachine = stateMachine;
         this.onStatusChangeHdl = this.onStatusChangeHdl.bind(this);
         this.wipTimeout = wipTimeout;
+        this.wipStart = Date.now();
     }
     Process.prototype.onStatusChangeHdl = function (newStatus) {
         if (this.status !== newStatus) {
@@ -7900,6 +8296,12 @@ var Process = /** @class */ (function () {
             }
             else {
                 this.timeDone = 0;
+            }
+            if (newStatus === types_1.ProcessStatus.wip) {
+                this.wipStart = Date.now();
+            }
+            else {
+                this.wipStart = 0;
             }
         }
         this.status = newStatus;
@@ -7917,18 +8319,22 @@ var Process = /** @class */ (function () {
         if (!this.errorTimeout && this.wipTimeout) {
             this.errorTimeout = Date.now();
         }
-        var wipTime = Date.now() - this.errorTimeout;
-        if (this.wipTimeout && wipTime > this.wipTimeout) {
-            this.state.stop = 0;
-            // TODO:: NOTFIFICATION ERROR
+        if (this.status === types_1.ProcessStatus.wip) {
+            var wipTime = Date.now() - this.wipStart;
+            this.state.wipTime = wipTime;
         }
+        else {
+            this.state.wipTime = 0;
+        }
+        /*    if (this.wipTimeout &&  wipTime > this.wipTimeout) {
+              this.state.stop = 0
+              // TODO:: NOTFIFICATION ERROR
+            }*/
         if (this.timeDone && this.status === types_1.ProcessStatus.done) {
             this.state.doneTime = Date.now() - this.timeDone;
-            this.state.wipTime = 0;
         }
         else {
             this.state.doneTime = 0;
-            this.state.wipTime = wipTime;
         }
         this.state = this.stateMachine(this.state, commands, this.onStatusChangeHdl);
     };
@@ -8111,18 +8517,35 @@ var checkToStop = function (button, state) {
     }
     return true;
 };
-exports.BoilProcessGroup = function (button, valveIn, valveOut, volumeSensor, resetVolumetric, autoMode) { return function (state, commands, changeStatus) {
+var calcTime = function (state, commands, sec) {
+    var current = Date.now();
+    var duration = Math.round((current - state.startBoil) / 1000);
+    if (duration < 0) {
+        duration = 0;
+    }
+    commands[sec] = duration;
+};
+exports.BoilProcessGroup = function (button, valveIn, valveOut, volumeSensor, resetVolumetric, sec, autoMode, presoaking, postPresoaking) { return function (state, commands, changeStatus) {
     var machine = SettingsStore_1.getLocalState().machine;
     var settings = SettingsStore_1.default.getState().settings;
     if (state.stop) {
         return state;
     }
+    if (machine[Converter_1.StmMessages.Button1] === '1') {
+        state.step = '0';
+        state.buttonState = machine[button];
+        changeStatus(types_1.ProcessStatus.done);
+        return __assign({}, state);
+    }
+    var presoakingTime = (parseInt(settings[presoaking], 10) || 0) * 1000;
+    var postPresoakingTime = (parseInt(settings[postPresoaking], 10) || 0) * 1000;
     switch (state.step) {
         case '1':
             if (checkToStop(button, state)) {
                 changeStatus(types_1.ProcessStatus.wip);
                 if (machine[volumeSensor] === '1') {
                     state.step = '2';
+                    state.startBoil = Date.now();
                 }
                 else {
                     commands[resetVolumetric]++;
@@ -8132,6 +8555,7 @@ exports.BoilProcessGroup = function (button, valveIn, valveOut, volumeSensor, re
         case '2':
             // START BEFORE BOIL
             if (checkToStop(button, state)) {
+                calcTime(state, commands, sec);
                 commands[valveOut]++;
                 commands[Converter_1.StmCommands.SetRelay8]++;
                 state.step = '3';
@@ -8140,8 +8564,9 @@ exports.BoilProcessGroup = function (button, valveIn, valveOut, volumeSensor, re
             break;
         case '3':
             if (checkToStop(button, state)) {
+                calcTime(state, commands, sec);
                 // time before boil. TODO: change 0 to setting
-                if (Date.now() - state.beforePressure > 1000) {
+                if (Date.now() - state.beforePressure > presoakingTime) {
                     state.step = '4';
                     state.silentBeforePressure = Date.now();
                 }
@@ -8153,8 +8578,9 @@ exports.BoilProcessGroup = function (button, valveIn, valveOut, volumeSensor, re
             break;
         case '4':
             if (checkToStop(button, state)) {
+                calcTime(state, commands, sec);
                 // time before boil. TODO: change 0 to setting
-                if (Date.now() - state.silentBeforePressure > 1000) {
+                if (Date.now() - state.silentBeforePressure > postPresoakingTime) {
                     state.step = '5';
                     state.silentBeforePressure = Date.now();
                 }
@@ -8162,6 +8588,7 @@ exports.BoilProcessGroup = function (button, valveIn, valveOut, volumeSensor, re
             break;
         case '5':
             if (checkToStop(button, state)) {
+                calcTime(state, commands, sec);
                 var volumne = parseInt(machine[volumeSensor], 10) || 0;
                 var needVolume = parseInt(settings[autoMode]) || 150;
                 if (volumne < needVolume) {
@@ -8195,6 +8622,283 @@ exports.BoilProcessGroup = function (button, valveIn, valveOut, volumeSensor, re
 
 /***/ }),
 
+/***/ "./src/actions/life/CleanMode.ts":
+/*!***************************************!*\
+  !*** ./src/actions/life/CleanMode.ts ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var types_1 = __webpack_require__(/*! ../../types */ "./src/types.ts");
+var SettingsStore_1 = __importStar(__webpack_require__(/*! ../../SettingsStore */ "./src/SettingsStore/index.ts"));
+var Converter_1 = __webpack_require__(/*! ../../../server/stm/Converter */ "./server/stm/Converter.ts");
+var checkToStop = function (button, state) {
+    var machine = SettingsStore_1.getLocalState().machine;
+    if ((machine[button] === '1' || machine[button] === '2') && machine[button] !== state.buttonState) {
+        state.step = '0';
+        state.buttonState = machine[button];
+        return false;
+    }
+    return true;
+};
+exports.CleanMode = function (button) { return function (state, commands, changeStatus) {
+    var machine = SettingsStore_1.getLocalState().machine;
+    var settings = SettingsStore_1.default.getState().settings;
+    if (state.stop) {
+        return state;
+    }
+    if (machine[Converter_1.StmMessages.Button1] === '1') {
+        state.step = '0';
+        state.buttonState = machine[button];
+        changeStatus(types_1.ProcessStatus.done);
+        return __assign({}, state);
+    }
+    var g1Temp = parseInt(settings.Group1Temperature, 10) || 0;
+    var g2Temp = parseInt(settings.Group2Temperature, 10) || 0;
+    switch (state.step) {
+        case '1':
+            if (checkToStop(button, state)) {
+                changeStatus(types_1.ProcessStatus.wip);
+                state.step = '2';
+                state.cleanStart1 = Date.now();
+            }
+            break;
+        case '2':
+            if (checkToStop(button, state)) {
+                if (Date.now() - state.cleanStart1 < 3000) {
+                    if (g1Temp > 70) {
+                        commands[Converter_1.StmCommands.SetValve2]++;
+                        commands[Converter_1.StmCommands.SetValve4]++;
+                    }
+                    if (g2Temp > 70) {
+                        commands[Converter_1.StmCommands.SetValve3]++;
+                        commands[Converter_1.StmCommands.SetValve5]++;
+                    }
+                    commands[Converter_1.StmCommands.SetRelay8]++;
+                }
+                else {
+                    state.step = '3';
+                    state.cleanStart1 = Date.now();
+                }
+            }
+            break;
+        case '3':
+            if (checkToStop(button, state)) {
+                if (Date.now() - state.cleanStart1 > 3000) {
+                    state.step = '4';
+                    state.cleanStart1 = Date.now();
+                }
+            }
+            break;
+        case '4':
+            if (checkToStop(button, state)) {
+                if (Date.now() - state.cleanStart1 < 3000) {
+                    if (g1Temp > 70) {
+                        commands[Converter_1.StmCommands.SetValve2]++;
+                        commands[Converter_1.StmCommands.SetValve4]++;
+                    }
+                    if (g2Temp > 70) {
+                        commands[Converter_1.StmCommands.SetValve3]++;
+                        commands[Converter_1.StmCommands.SetValve5]++;
+                    }
+                    commands[Converter_1.StmCommands.SetRelay8]++;
+                }
+                else {
+                    state.step = '5';
+                    state.cleanStart1 = Date.now();
+                }
+            }
+            break;
+        case '5':
+            if (checkToStop(button, state)) {
+                if (Date.now() - state.cleanStart1 > 3000) {
+                    state.step = '0';
+                    state.cleanStart1 = Date.now();
+                }
+            }
+            break;
+        default:
+            changeStatus(types_1.ProcessStatus.done);
+            if (machine[button] === '1' || machine[button] === '2') {
+                if (state.buttonState === '1' || state.buttonState === '2') {
+                    if (machine[button] !== state.buttonState) {
+                        state.step = '1';
+                        state.buttonState = machine[button];
+                    }
+                }
+                else {
+                    state.buttonState = machine[button];
+                }
+            }
+            break;
+    }
+    return __assign({}, state);
+}; };
+
+
+/***/ }),
+
+/***/ "./src/actions/life/Color.ts":
+/*!***********************************!*\
+  !*** ./src/actions/life/Color.ts ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var types_1 = __webpack_require__(/*! ../../types */ "./src/types.ts");
+var SettingsStore_1 = __importStar(__webpack_require__(/*! ../../SettingsStore */ "./src/SettingsStore/index.ts"));
+exports.Color = function (setTemp, trend, red, green, blue) { return function (state, commands, changeStatus) {
+    var machine = SettingsStore_1.getLocalState().machine;
+    var settings = SettingsStore_1.default.getState().settings;
+    var life = SettingsStore_1.getLocalState().life;
+    var redHot = (parseInt(settings.RedHot, 10) || 0) / 16;
+    var greenHot = (parseInt(settings.GreenHot, 10) || 0) / 16;
+    var blueHot = (parseInt(settings.BlueHot, 10) || 0) / 16;
+    var alphaHot = (parseInt(settings.AlphaHot, 10) || 0) / 16;
+    var redCold = (parseInt(settings.RedCold, 10) || 0) / 16;
+    var greenCold = (parseInt(settings.GreenCold, 10) || 0) / 16;
+    var blueCold = (parseInt(settings.BlueCold, 10) || 0) / 16;
+    var alphaCold = (parseInt(settings.AlphaCold, 10) || 0) / 16;
+    if (state.stop) {
+        return state;
+    }
+    var needTemp = parseInt(settings[setTemp], 10) || 0;
+    var trendG = life[trend];
+    var temperature = trendG[trendG.length - 1] && trendG[trendG.length - 1].value || 0;
+    switch (state.step) {
+        case '1':
+            if (Date.now() - state.stepStart > 1000) {
+                changeStatus(types_1.ProcessStatus.wip);
+            }
+            break;
+        default:
+            changeStatus(types_1.ProcessStatus.done);
+            if (needTemp < 70) {
+                commands[red] = 0;
+                commands[green] = 0;
+                commands[blue] = 0;
+            }
+            state.stepStart = Date.now();
+            if (temperature - 20 >= needTemp) {
+                commands[red] = (redHot * alphaHot) * 65534;
+                commands[green] = (greenHot * alphaHot) * 65534;
+                commands[blue] = (blueHot * alphaHot) * 65534;
+            }
+            else {
+                commands[red] = (temperature * redHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * redCold * alphaCold * 65534;
+                commands[green] = (temperature * greenHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * greenCold * alphaCold * 65534;
+                commands[blue] = (temperature * blueHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * blueCold * alphaCold * 65534;
+                if (commands[red] > 65534) {
+                    commands[red] = 65534;
+                }
+                if (commands[green] > 65534) {
+                    commands[green] = 65534;
+                }
+                if (commands[blue] > 65534) {
+                    commands[blue] = 65534;
+                }
+            }
+            break;
+    }
+    return __assign({}, state);
+}; };
+
+
+/***/ }),
+
+/***/ "./src/actions/life/SleepMode.ts":
+/*!***************************************!*\
+  !*** ./src/actions/life/SleepMode.ts ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var types_1 = __webpack_require__(/*! ../../types */ "./src/types.ts");
+var SettingsStore_1 = __webpack_require__(/*! ../../SettingsStore */ "./src/SettingsStore/index.ts");
+var Converter_1 = __webpack_require__(/*! ../../../server/stm/Converter */ "./server/stm/Converter.ts");
+exports.SleepMode = function (state, commands, changeStatus) {
+    var machine = SettingsStore_1.getLocalState().machine;
+    if (state.stop) {
+        return state;
+    }
+    switch (state.step) {
+        case '1':
+            if (machine[Converter_1.StmMessages.Button1] === '2') {
+                state.step = '0';
+            }
+            else {
+                changeStatus(types_1.ProcessStatus.wip);
+            }
+            break;
+        default:
+            changeStatus(types_1.ProcessStatus.done);
+            if (machine[Converter_1.StmMessages.Button1] === '1') {
+                state.step = '1';
+            }
+            break;
+    }
+    return __assign({}, state);
+};
+
+
+/***/ }),
+
 /***/ "./src/actions/life/WarmGroup.ts":
 /*!***************************************!*\
   !*** ./src/actions/life/WarmGroup.ts ***!
@@ -8224,6 +8928,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsStore_1 = __importStar(__webpack_require__(/*! ../../SettingsStore */ "./src/SettingsStore/index.ts"));
+var Converter_1 = __webpack_require__(/*! ../../../server/stm/Converter */ "./server/stm/Converter.ts");
 exports.WarmGroup = function (pressure, rele1, rele2, // ????
 setTemp, trend) { return function (state, commands, changeStatus) {
     var machine = SettingsStore_1.getLocalState().machine;
@@ -8237,8 +8942,11 @@ setTemp, trend) { return function (state, commands, changeStatus) {
     if (needTemp < 70 || pressureG < 500) {
         return state;
     }
+    if (machine[Converter_1.StmMessages.Button1] === '1') {
+        needTemp = 75;
+    }
     var trendG = life[trend];
-    var temperature = trendG[trendG.length - 1].value;
+    var temperature = trendG[trendG.length - 1] && trendG[trendG.length - 1].value || 0;
     //const speed = life['speedG1']
     switch (state.step) {
         case '1':
@@ -8267,13 +8975,39 @@ setTemp, trend) { return function (state, commands, changeStatus) {
             state.power = P + I + D;
             state.power *= 1000;
             if (state.power < 0) {
-                state.waitWarmTimeout = 300;
+                state.waitWarmTimeout = 500;
             }
             else {
-                state.waitWarmTimeout = state.power > 5000 ? 5000 : state.power;
+                if (e < -0.5) {
+                    state.power = 0;
+                    state.waitWarmTimeout = 1000;
+                }
+                else if (e < 0) {
+                    state.power = state.power / 2;
+                    if (state.power < 1000) {
+                        state.power = 0;
+                        state.waitWarmTimeout = 500;
+                    }
+                    else {
+                        state.waitWarmTimeout = state.power > 5000 ? 5000 : state.power;
+                    }
+                }
+                else if (e < 1) {
+                    state.power = state.power / 2;
+                    if (state.power < 800) {
+                        state.power = 800;
+                    }
+                    state.waitWarmTimeout = state.power > 5000 ? 5000 : state.power;
+                }
+                else {
+                    if (state.power < 1000) {
+                        state.power = 1000;
+                    }
+                    state.waitWarmTimeout = state.power > 5000 ? 5000 : state.power;
+                }
             }
             state.prevError = e;
-            state.step = 1;
+            state.step = '1';
             state.stepStart = Date.now();
             break;
     }
@@ -8328,15 +9062,16 @@ exports.WarmPredict = function (state, commands, changeStatus) {
         return state;
     }
     var temperature = parseInt(machine[Converter_1.StmMessages.PredictGroupTemperature], 10);
-    if (temperature < 75) {
+    var needPr = parseInt(settings.PredictTemperature, 10) || 10;
+    if (temperature < needPr - 3) {
         state.started = 1;
         changeStatus(types_1.ProcessStatus.wip);
-        commands[Converter_1.StmCommands.SetRelay1]++;
+        commands[Converter_1.StmCommands.SetRelay3]++;
     }
     else if (state.started) {
-        commands[Converter_1.StmCommands.SetRelay1]++;
+        commands[Converter_1.StmCommands.SetRelay3]++;
     }
-    else if (temperature > 85) {
+    else if (temperature > needPr + 3) {
         state.started = 0;
         changeStatus(types_1.ProcessStatus.done);
     }
@@ -8440,12 +9175,29 @@ exports.WaterLevelGroup = function (groupPressureFlag, commandValve, settingsKey
     }
     var pressure = parseInt(machine[groupPressureFlag], 10) || 0;
     var needTemperature = parseInt(settings[settingsKey]) || 0;
-    if (pressure < 100 && needTemperature > 70) {
+    if (needTemperature < 70) {
+        changeStatus(types_1.ProcessStatus.done);
+        return __assign({}, state);
+    }
+    if (pressure < 100) {
+        if (!state.started) {
+            state.started = Date.now();
+        }
+        if (Date.now() - state.started > 1000) {
+            state.wasStartedWarm = 1;
+            changeStatus(types_1.ProcessStatus.wip);
+            commands[Converter_1.StmCommands.SetRelay8]++;
+            commands[commandValve]++;
+        }
+    }
+    else if (state.wasStartedWarm && pressure < 400) {
         changeStatus(types_1.ProcessStatus.wip);
         commands[Converter_1.StmCommands.SetRelay8]++;
         commands[commandValve]++;
     }
     else {
+        state.wasStartedWarm = 0;
+        state.started = 0;
         changeStatus(types_1.ProcessStatus.done);
     }
     return __assign({}, state);
@@ -8473,18 +9225,42 @@ var WaterLevelGroup_1 = __webpack_require__(/*! ./life/WaterLevelGroup */ "./src
 var BoilProcessGroup_1 = __webpack_require__(/*! ./life/BoilProcessGroup */ "./src/actions/life/BoilProcessGroup.ts");
 var WarmPredict_1 = __webpack_require__(/*! ./life/WarmPredict */ "./src/actions/life/WarmPredict.ts");
 var WarmGroup_1 = __webpack_require__(/*! ./life/WarmGroup */ "./src/actions/life/WarmGroup.ts");
+var SleepMode_1 = __webpack_require__(/*! ./life/SleepMode */ "./src/actions/life/SleepMode.ts");
+var CleanMode_1 = __webpack_require__(/*! ./life/CleanMode */ "./src/actions/life/CleanMode.ts");
+var Color_1 = __webpack_require__(/*! ./life/Color */ "./src/actions/life/Color.ts");
 var MachineLife = /** @class */ (function () {
     function MachineLife() {
         this.processes = [];
         this.count = 0;
-        var boilGroup1 = new Process_1.Process('boilGroup1', BoilProcessGroup_1.BoilProcessGroup(Converter_1.StmMessages.Button3, Converter_1.StmCommands.SetValve2, Converter_1.StmCommands.SetValve4, Converter_1.StmMessages.VolumetricGroup1, Converter_1.StmCommands.ResetVolumetricG1, 'Group1AutoMode1'), 0);
-        var boilGroup2 = new Process_1.Process('boilGroup1', BoilProcessGroup_1.BoilProcessGroup(Converter_1.StmMessages.Button6, Converter_1.StmCommands.SetValve3, Converter_1.StmCommands.SetValve5, Converter_1.StmMessages.VolumetricGroup2, Converter_1.StmCommands.ResetVolumetricG2, 'Group1AutoMode2'), 0);
+        this.needSend = false;
+        var boilGroup1 = new Process_1.Process('boilGroup1', BoilProcessGroup_1.BoilProcessGroup(Converter_1.StmMessages.Button3, Converter_1.StmCommands.SetValve2, Converter_1.StmCommands.SetValve4, Converter_1.StmMessages.VolumetricGroup1, Converter_1.StmCommands.ResetVolumetricG1, Converter_1.StmCommands.SetSecGroup1, 'Group1AutoMode1', 'Group1Presoaking', 'Group1PostPresoaking'), 0);
+        var boilGroup2 = new Process_1.Process('boilGroup1', BoilProcessGroup_1.BoilProcessGroup(Converter_1.StmMessages.Button6, Converter_1.StmCommands.SetValve3, Converter_1.StmCommands.SetValve5, Converter_1.StmMessages.VolumetricGroup2, Converter_1.StmCommands.ResetVolumetricG2, Converter_1.StmCommands.SetSecGroup2, 'Group2AutoMode1', 'Group2Presoaking', 'Group2PostPresoaking'), 0);
         var waterLevel = new Process_1.Process('waterLevel', WaterLevel_1.WaterLevel, 0);
         var predictWarm = new Process_1.Process('predictWarm', WarmPredict_1.WarmPredict, 0);
+        var sleepMode = new Process_1.Process('SleepMode', SleepMode_1.SleepMode, 0);
+        var colorG1 = new Process_1.Process('ColorG1', Color_1.Color("Group1Temperature", "middleTTrendG1", Converter_1.StmCommands.SetRedGroup1, Converter_1.StmCommands.SetGreenGroup1, Converter_1.StmCommands.SetBlueGroup1), 0);
+        var colorG2 = new Process_1.Process('ColorG2', Color_1.Color("Group2Temperature", "middleTTrendG2", Converter_1.StmCommands.SetRedGroup2, Converter_1.StmCommands.SetGreenGroup2, Converter_1.StmCommands.SetBlueGroup2), 0);
+        var cleanMode = new Process_1.Process('CleanMode', CleanMode_1.CleanMode(Converter_1.StmMessages.Button9), 0);
         var waterLevelG1 = new Process_1.Process('waterLevelG1', WaterLevelGroup_1.WaterLevelGroup(Converter_1.StmMessages.Group1Pressure, Converter_1.StmCommands.SetValve2, 'Group1Temperature'), 0);
         var waterLevelG2 = new Process_1.Process('waterLevelG2', WaterLevelGroup_1.WaterLevelGroup(Converter_1.StmMessages.Group2Pressure, Converter_1.StmCommands.SetValve3, 'Group2Temperature'), 0);
         var warmG1 = new Process_1.Process('warmG1', WarmGroup_1.WarmGroup(Converter_1.StmMessages.Group1Pressure, Converter_1.StmCommands.SetRelay4, Converter_1.StmCommands.SetRelay5, "Group1Temperature", "middleTTrendG1"), 0);
         var warmG2 = new Process_1.Process('warmG2', WarmGroup_1.WarmGroup(Converter_1.StmMessages.Group2Pressure, Converter_1.StmCommands.SetRelay6, Converter_1.StmCommands.SetRelay7, "Group2Temperature", "middleTTrendG2"), 0);
+        this.addProcess({
+            process: colorG1,
+            children: []
+        });
+        this.addProcess({
+            process: colorG2,
+            children: []
+        });
+        this.addProcess({
+            process: cleanMode,
+            children: [boilGroup1, boilGroup2, predictWarm]
+        });
+        this.addProcess({
+            process: sleepMode,
+            children: []
+        });
         this.addProcess({
             process: boilGroup1,
             children: [waterLevelG1]
@@ -8493,6 +9269,8 @@ var MachineLife = /** @class */ (function () {
             process: boilGroup2,
             children: [waterLevelG2]
         });
+        colorG1.start();
+        colorG2.start();
         boilGroup1.start();
         boilGroup2.start();
         waterLevel.start();
@@ -8501,6 +9279,8 @@ var MachineLife = /** @class */ (function () {
         waterLevelG2.start();
         warmG1.start();
         warmG2.start();
+        cleanMode.start();
+        sleepMode.start();
         this.addProcess({
             process: waterLevel,
             children: []
@@ -8543,11 +9323,13 @@ var MachineLife = /** @class */ (function () {
         var machine = SettingsStore_1.getLocalState().machine;
         if (commands[command] > 0) {
             if (machine[status] === '2') {
+                this.needSend = true;
                 SettingsStore_1.emitStm({ id: command, content: '1' });
             }
         }
         else {
             if (machine[status] === '1') {
+                this.needSend = true;
                 SettingsStore_1.emitStm({ id: command, content: '0' });
             }
         }
@@ -8555,6 +9337,7 @@ var MachineLife = /** @class */ (function () {
     MachineLife.prototype.step = function () {
         var _a;
         var machine = SettingsStore_1.getLocalState().machine;
+        this.needSend = false;
         var commands = (_a = {},
             _a[Converter_1.StmCommands.SetValve1] = 0,
             _a[Converter_1.StmCommands.SetValve2] = 0,
@@ -8589,34 +9372,6 @@ var MachineLife = /** @class */ (function () {
                 one.process.step(commands);
             }
         });
-        if (this.count < 3) {
-            this.count++;
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup1, content: '50000' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup2, content: '50000' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup1, content: '0' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup2, content: '0' });
-        }
-        else if (this.count < 6) {
-            this.count++;
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup1, content: '0' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup2, content: '0' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetRedGroup1, content: '50000' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetRedGroup2, content: '50000' });
-        }
-        else if (this.count < 9) {
-            this.count++;
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup1, content: '50000' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup2, content: '50000' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetRedGroup1, content: '0' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetRedGroup2, content: '0' });
-        }
-        else {
-            this.count = 0;
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup1, content: '50000' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup2, content: '50000' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup1, content: '0' });
-            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup2, content: '0' });
-        }
         this.checkAndSend(commands, Converter_1.StmCommands.SetRelay1, Converter_1.StmMessages.Relay1);
         this.checkAndSend(commands, Converter_1.StmCommands.SetRelay2, Converter_1.StmMessages.Relay2);
         this.checkAndSend(commands, Converter_1.StmCommands.SetRelay3, Converter_1.StmMessages.Relay3);
@@ -8633,11 +9388,33 @@ var MachineLife = /** @class */ (function () {
         this.checkAndSend(commands, Converter_1.StmCommands.SetValve6, Converter_1.StmMessages.Valve6);
         var vol1 = parseInt(machine[Converter_1.StmMessages.VolumetricGroup1]) || 1;
         if (vol1 > 1 && commands[Converter_1.StmCommands.ResetVolumetricG1] > 0) {
+            this.needSend = true;
             SettingsStore_1.emitStm({ id: Converter_1.StmCommands.ResetVolumetricG1, content: '1' });
         }
         var vol2 = parseInt(machine[Converter_1.StmMessages.VolumetricGroup2]) || 1;
         if (vol2 > 1 && commands[Converter_1.StmCommands.ResetVolumetricG2] > 0) {
+            this.needSend = true;
             SettingsStore_1.emitStm({ id: Converter_1.StmCommands.ResetVolumetricG2, content: '1' });
+        }
+        if (commands[Converter_1.StmCommands.SetSecGroup1] > 0) {
+            this.needSend = true;
+            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetSecGroup1, content: "" + commands[Converter_1.StmCommands.SetSecGroup1] });
+        }
+        if (commands[Converter_1.StmCommands.SetSecGroup2] > 0) {
+            this.needSend = true;
+            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetSecGroup2, content: "" + commands[Converter_1.StmCommands.SetSecGroup2] });
+        }
+        var procG1 = this.processes.find(function (pr) { return pr.process.name === 'ColorG1'; });
+        if (procG1 && procG1.process && procG1.process.status === types_1.ProcessStatus.done) {
+            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetRedGroup1, content: "" + commands[Converter_1.StmCommands.SetRedGroup1] });
+            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup1, content: "" + commands[Converter_1.StmCommands.SetBlueGroup1] });
+            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup1, content: "" + commands[Converter_1.StmCommands.SetGreenGroup1] });
+        }
+        var procG2 = this.processes.find(function (pr) { return pr.process.name === 'ColorG2'; });
+        if (procG2 && procG2.process && procG2.process.status === types_1.ProcessStatus.done) {
+            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetRedGroup2, content: "" + commands[Converter_1.StmCommands.SetRedGroup2] });
+            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup2, content: "" + commands[Converter_1.StmCommands.SetBlueGroup2] });
+            SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup2, content: "" + commands[Converter_1.StmCommands.SetGreenGroup2] });
         }
     };
     return MachineLife;
@@ -8724,22 +9501,30 @@ var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 var actionTypes_1 = __importDefault(__webpack_require__(/*! ../actions/actionTypes */ "./src/actions/actionTypes.ts"));
 var Converter_1 = __importStar(__webpack_require__(/*! ../../server/stm/Converter */ "./server/stm/Converter.ts"));
+var validate_1 = __webpack_require__(/*! ./validate */ "./src/reducers/validate.ts");
 var initialStandartProfile = {
     title: "Стандарт",
     settings: {
         Group1Temperature: '0',
         Group1AutoMode1: '0',
         Group1AutoMode2: '0',
+        Group1Presoaking: '0',
+        Group1PostPresoaking: '0',
         Group2Temperature: '0',
         Group2AutoMode1: '0',
         Group2AutoMode2: '0',
+        Group2Presoaking: '0',
+        Group2PostPresoaking: '0',
+        PredictTemperature: '0',
         SteamPressure: '0',
         RedCold: '0',
         GreenCold: '0',
         BlueCold: '16',
+        AlphaCold: '16',
         RedHot: '16',
         GreenHot: '0',
         BlueHot: '0',
+        AlphaHot: '16',
         EnergyMode: '0',
     }
 };
@@ -8875,9 +9660,21 @@ function rootReducer(state, action) {
                 // @ts-ignore
                 return __assign(__assign({}, state), { machine: __assign({}, action.payload.machine), life: __assign({}, action.payload.life) });
             case actionTypes_1.default.currentInfoUpdate:
+                if (!validate_1.Validate(action.payload.id, action.payload.content)) {
+                    return state;
+                }
                 state.machine[action.payload.id] = action.payload.content;
                 if (action.payload.id === Converter_1.StmMessages.PredictGroupTemperature) {
                     state.machine[action.payload.id] = "" + Math.round(Converter_1.default.voltToCelsium(action.payload.content) * 10) / 10;
+                }
+                if (action.payload.id === Converter_1.StmMessages.VolumetricGroup1 || action.payload.id === Converter_1.StmMessages.VolumetricGroup2) {
+                    var volValue = parseInt(action.payload.content) || 1;
+                    state.machine[action.payload.id] = "" + Converter_1.default.volumetric(volValue);
+                }
+                if (action.payload.id === Converter_1.StmMessages.SteamPressure ||
+                    action.payload.id === Converter_1.StmMessages.Group1Pressure || action.payload.id === Converter_1.StmMessages.Group2Pressure) {
+                    var prValue = parseInt(action.payload.content) || 0;
+                    state.machine[action.payload.id] = "" + Converter_1.default.compressure(prValue);
                 }
                 if (action.payload.id === Converter_1.StmMessages.Group1Temperature) {
                     var temp = Converter_1.default.voltToCelsium(action.payload.content);
@@ -8907,9 +9704,14 @@ function rootReducer(state, action) {
                 }
                 return __assign(__assign({}, state), { machine: __assign({}, state.machine), life: __assign({}, state.life) });
             case actionTypes_1.default.settingsProfilesInitialize:
-                return __assign(__assign({}, state), { choosenProfile: action.payload.settingsProfiles.choosenProfile, profiles: action.payload.settingsProfiles.profiles.concat() });
+                state.choosenProfile = action.payload.settingsProfiles.choosenProfile;
+                state.profiles = __spreadArrays(action.payload.settingsProfiles.profiles);
+                currentProfileIndex = getCurrentProfileIndex(state);
+                return __assign(__assign({}, state), { settings: __assign({}, state.profiles[currentProfileIndex].settings) });
             case actionTypes_1.default.setProfile:
-                return __assign(__assign({}, state), { settings: __assign({}, state.profiles[currentProfileIndex].settings), choosenProfile: action.payload, profiles: state.profiles });
+                state.choosenProfile = action.payload;
+                currentProfileIndex = getCurrentProfileIndex(state);
+                return __assign(__assign({}, state), { settings: __assign({}, state.profiles[currentProfileIndex].settings) });
         }
     }
     catch (e) {
@@ -8918,6 +9720,37 @@ function rootReducer(state, action) {
     return state;
 }
 exports.default = rootReducer;
+
+
+/***/ }),
+
+/***/ "./src/reducers/validate.ts":
+/*!**********************************!*\
+  !*** ./src/reducers/validate.ts ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Converter_1 = __webpack_require__(/*! ../../server/stm/Converter */ "./server/stm/Converter.ts");
+exports.Validate = function (id, value) {
+    switch (id) {
+        case Converter_1.StmMessages.Button1:
+        case Converter_1.StmMessages.Button2:
+        case Converter_1.StmMessages.Button3:
+        case Converter_1.StmMessages.Button4:
+        case Converter_1.StmMessages.Button5:
+        case Converter_1.StmMessages.Button6:
+        case Converter_1.StmMessages.Button7:
+        case Converter_1.StmMessages.Button8:
+        case Converter_1.StmMessages.Button9:
+            return (value === '1' || value === '2');
+        default:
+            return true;
+    }
+};
 
 
 /***/ }),
