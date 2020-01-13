@@ -9134,14 +9134,14 @@ exports.Color = function (setTemp, trend, red, green, blue) { return function (s
             }
             state.stepStart = Date.now();
             if (temperature - 20 >= needTemp) {
-                commands[red] = (redHot * alphaHot) * 65534;
-                commands[green] = (greenHot * alphaHot) * 65534;
-                commands[blue] = (blueHot * alphaHot) * 65534;
+                commands[red] = Math.round((redHot * alphaHot) * 65534);
+                commands[green] = Math.round((greenHot * alphaHot) * 65534);
+                commands[blue] = Math.round((blueHot * alphaHot) * 65534);
             }
             else {
-                commands[red] = (temperature * redHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * redCold * alphaCold * 65534;
-                commands[green] = (temperature * greenHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * greenCold * alphaCold * 65534;
-                commands[blue] = (temperature * blueHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * blueCold * alphaCold * 65534;
+                commands[red] = Math.round((temperature * redHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * redCold * alphaCold * 65534);
+                commands[green] = Math.round((temperature * greenHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * greenCold * alphaCold * 65534);
+                commands[blue] = Math.round((temperature * blueHot * alphaHot / needTemp) * 65534 + ((needTemp - temperature) / needTemp) * blueCold * alphaCold * 65534);
                 if (commands[red] > 65534) {
                     commands[red] = 65534;
                 }
@@ -9725,7 +9725,6 @@ var MachineLife = /** @class */ (function () {
         }
         var procG1 = this.processes.find(function (pr) { return pr.process.name === 'ColorG1'; });
         if (procG1 && procG1.process && procG1.process.status === types_1.ProcessStatus.done) {
-            console.log(commands[Converter_1.StmCommands.SetRedGroup1] + "\n      " + commands[Converter_1.StmCommands.SetGreenGroup1] + "\n      " + commands[Converter_1.StmCommands.SetBlueGroup1] + "\n      ");
             SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetRedGroup1, content: "" + commands[Converter_1.StmCommands.SetRedGroup1] });
             SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetBlueGroup1, content: "" + commands[Converter_1.StmCommands.SetBlueGroup1] });
             SettingsStore_1.emitStm({ id: Converter_1.StmCommands.SetGreenGroup1, content: "" + commands[Converter_1.StmCommands.SetGreenGroup1] });
