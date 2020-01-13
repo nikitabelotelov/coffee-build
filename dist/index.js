@@ -1153,60 +1153,58 @@ function createMemoryHistory(props) {
 "use strict";
 
 
+var reactIs = __webpack_require__(/*! react-is */ "./node_modules/react-is/index.js");
+
 /**
  * Copyright 2015, Yahoo! Inc.
  * Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
  */
-var ReactIs = __webpack_require__(/*! react-is */ "./node_modules/react-is/index.js");
 var REACT_STATICS = {
-    childContextTypes: true,
-    contextType: true,
-    contextTypes: true,
-    defaultProps: true,
-    displayName: true,
-    getDefaultProps: true,
-    getDerivedStateFromError: true,
-    getDerivedStateFromProps: true,
-    mixins: true,
-    propTypes: true,
-    type: true
+  childContextTypes: true,
+  contextType: true,
+  contextTypes: true,
+  defaultProps: true,
+  displayName: true,
+  getDefaultProps: true,
+  getDerivedStateFromError: true,
+  getDerivedStateFromProps: true,
+  mixins: true,
+  propTypes: true,
+  type: true
 };
-
 var KNOWN_STATICS = {
-    name: true,
-    length: true,
-    prototype: true,
-    caller: true,
-    callee: true,
-    arguments: true,
-    arity: true
+  name: true,
+  length: true,
+  prototype: true,
+  caller: true,
+  callee: true,
+  arguments: true,
+  arity: true
 };
-
 var FORWARD_REF_STATICS = {
-    '$$typeof': true,
-    render: true,
-    defaultProps: true,
-    displayName: true,
-    propTypes: true
+  '$$typeof': true,
+  render: true,
+  defaultProps: true,
+  displayName: true,
+  propTypes: true
 };
-
 var MEMO_STATICS = {
-    '$$typeof': true,
-    compare: true,
-    defaultProps: true,
-    displayName: true,
-    propTypes: true,
-    type: true
+  '$$typeof': true,
+  compare: true,
+  defaultProps: true,
+  displayName: true,
+  propTypes: true,
+  type: true
 };
-
 var TYPE_STATICS = {};
-TYPE_STATICS[ReactIs.ForwardRef] = FORWARD_REF_STATICS;
+TYPE_STATICS[reactIs.ForwardRef] = FORWARD_REF_STATICS;
 
 function getStatics(component) {
-    if (ReactIs.isMemo(component)) {
-        return MEMO_STATICS;
-    }
-    return TYPE_STATICS[component['$$typeof']] || REACT_STATICS;
+  if (reactIs.isMemo(component)) {
+    return MEMO_STATICS;
+  }
+
+  return TYPE_STATICS[component['$$typeof']] || REACT_STATICS;
 }
 
 var defineProperty = Object.defineProperty;
@@ -1215,42 +1213,41 @@ var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 var getPrototypeOf = Object.getPrototypeOf;
 var objectPrototype = Object.prototype;
-
 function hoistNonReactStatics(targetComponent, sourceComponent, blacklist) {
-    if (typeof sourceComponent !== 'string') {
-        // don't hoist over string (html) components
+  if (typeof sourceComponent !== 'string') {
+    // don't hoist over string (html) components
+    if (objectPrototype) {
+      var inheritedComponent = getPrototypeOf(sourceComponent);
 
-        if (objectPrototype) {
-            var inheritedComponent = getPrototypeOf(sourceComponent);
-            if (inheritedComponent && inheritedComponent !== objectPrototype) {
-                hoistNonReactStatics(targetComponent, inheritedComponent, blacklist);
-            }
-        }
-
-        var keys = getOwnPropertyNames(sourceComponent);
-
-        if (getOwnPropertySymbols) {
-            keys = keys.concat(getOwnPropertySymbols(sourceComponent));
-        }
-
-        var targetStatics = getStatics(targetComponent);
-        var sourceStatics = getStatics(sourceComponent);
-
-        for (var i = 0; i < keys.length; ++i) {
-            var key = keys[i];
-            if (!KNOWN_STATICS[key] && !(blacklist && blacklist[key]) && !(sourceStatics && sourceStatics[key]) && !(targetStatics && targetStatics[key])) {
-                var descriptor = getOwnPropertyDescriptor(sourceComponent, key);
-                try {
-                    // Avoid failures from read-only properties
-                    defineProperty(targetComponent, key, descriptor);
-                } catch (e) {}
-            }
-        }
-
-        return targetComponent;
+      if (inheritedComponent && inheritedComponent !== objectPrototype) {
+        hoistNonReactStatics(targetComponent, inheritedComponent, blacklist);
+      }
     }
 
-    return targetComponent;
+    var keys = getOwnPropertyNames(sourceComponent);
+
+    if (getOwnPropertySymbols) {
+      keys = keys.concat(getOwnPropertySymbols(sourceComponent));
+    }
+
+    var targetStatics = getStatics(targetComponent);
+    var sourceStatics = getStatics(sourceComponent);
+
+    for (var i = 0; i < keys.length; ++i) {
+      var key = keys[i];
+
+      if (!KNOWN_STATICS[key] && !(blacklist && blacklist[key]) && !(sourceStatics && sourceStatics[key]) && !(targetStatics && targetStatics[key])) {
+        var descriptor = getOwnPropertyDescriptor(sourceComponent, key);
+
+        try {
+          // Avoid failures from read-only properties
+          defineProperty(targetComponent, key, descriptor);
+        } catch (e) {}
+      }
+    }
+  }
+
+  return targetComponent;
 }
 
 module.exports = hoistNonReactStatics;
@@ -2407,7 +2404,7 @@ module.exports = ReactPropTypesSecret;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/** @license React v16.11.0
+/** @license React v16.12.0
  * react-is.development.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -2532,6 +2529,8 @@ function typeOf(object) {
             switch ($$typeofType) {
               case REACT_CONTEXT_TYPE:
               case REACT_FORWARD_REF_TYPE:
+              case REACT_LAZY_TYPE:
+              case REACT_MEMO_TYPE:
               case REACT_PROVIDER_TYPE:
                 return $$typeofType;
 
@@ -2541,8 +2540,6 @@ function typeOf(object) {
 
         }
 
-      case REACT_LAZY_TYPE:
-      case REACT_MEMO_TYPE:
       case REACT_PORTAL_TYPE:
         return $$typeof;
     }
@@ -2770,7 +2767,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_is__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-is */ "./node_modules/react-is/index.js");
 /* harmony import */ var react_is__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_is__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _utils_Subscription__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/Subscription */ "./node_modules/react-redux/es/utils/Subscription.js");
-/* harmony import */ var _Context__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Context */ "./node_modules/react-redux/es/components/Context.js");
+/* harmony import */ var _utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../utils/useIsomorphicLayoutEffect */ "./node_modules/react-redux/es/utils/useIsomorphicLayoutEffect.js");
+/* harmony import */ var _Context__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Context */ "./node_modules/react-redux/es/components/Context.js");
+
 
 
 
@@ -2798,26 +2797,20 @@ function storeStateUpdatesReducer(state, action) {
 
 var initStateUpdates = function initStateUpdates() {
   return [null, 0];
-}; // React currently throws a warning when using useLayoutEffect on the server.
-// To get around it, we can conditionally useEffect on the server (no-op) and
-// useLayoutEffect in the browser. We need useLayoutEffect because we want
-// `connect` to perform sync updates to a ref to save the latest props after
-// a render is actually committed to the DOM.
+};
 
-
-var useIsomorphicLayoutEffect = typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.createElement !== 'undefined' ? react__WEBPACK_IMPORTED_MODULE_4__["useLayoutEffect"] : react__WEBPACK_IMPORTED_MODULE_4__["useEffect"];
 function connectAdvanced(
 /*
   selectorFactory is a func that is responsible for returning the selector function used to
   compute new props from state, props, and dispatch. For example:
-     export default connectAdvanced((dispatch, options) => (state, props) => ({
+      export default connectAdvanced((dispatch, options) => (state, props) => ({
       thing: state.things[props.thingId],
       saveThing: fields => dispatch(actionCreators.saveThing(props.thingId, fields)),
     }))(YourComponent)
-   Access to dispatch is provided to the factory so selectorFactories can bind actionCreators
+    Access to dispatch is provided to the factory so selectorFactories can bind actionCreators
   outside of their selector as an optimization. Options passed to connectAdvanced are passed to
   the selectorFactory, along with displayName and WrappedComponent, as the second argument.
-   Note that selectorFactory is responsible for all caching/memoization of inbound and outbound
+    Note that selectorFactory is responsible for all caching/memoization of inbound and outbound
   props. Do not use connectAdvanced directly without memoizing results between calls to your
   selector, otherwise the Connect component will re-render on every state or props change.
 */
@@ -2845,7 +2838,7 @@ _ref) {
       _ref2$forwardRef = _ref2.forwardRef,
       forwardRef = _ref2$forwardRef === void 0 ? false : _ref2$forwardRef,
       _ref2$context = _ref2.context,
-      context = _ref2$context === void 0 ? _Context__WEBPACK_IMPORTED_MODULE_7__["ReactReduxContext"] : _ref2$context,
+      context = _ref2$context === void 0 ? _Context__WEBPACK_IMPORTED_MODULE_8__["ReactReduxContext"] : _ref2$context,
       connectOptions = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_1__["default"])(_ref2, ["getDisplayName", "methodName", "renderCountProp", "shouldHandleStateChanges", "storeKey", "withRef", "forwardRef", "context"]);
 
   invariant__WEBPACK_IMPORTED_MODULE_3___default()(renderCountProp === undefined, "renderCountProp is removed. render counting is built into the latest React Dev Tools profiling extension");
@@ -2905,12 +2898,15 @@ _ref) {
         return propsContext && propsContext.Consumer && Object(react_is__WEBPACK_IMPORTED_MODULE_5__["isContextConsumer"])(react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(propsContext.Consumer, null)) ? propsContext : Context;
       }, [propsContext, Context]); // Retrieve the store and ancestor subscription via context, if available
 
-      var contextValue = Object(react__WEBPACK_IMPORTED_MODULE_4__["useContext"])(ContextToUse); // The store _must_ exist as either a prop or in context
+      var contextValue = Object(react__WEBPACK_IMPORTED_MODULE_4__["useContext"])(ContextToUse); // The store _must_ exist as either a prop or in context.
+      // We'll check to see if it _looks_ like a Redux store first.
+      // This allows us to pass through a `store` prop that is just a plain value.
 
-      var didStoreComeFromProps = Boolean(props.store);
+      var didStoreComeFromProps = Boolean(props.store) && Boolean(props.store.getState) && Boolean(props.store.dispatch);
       var didStoreComeFromContext = Boolean(contextValue) && Boolean(contextValue.store);
-      invariant__WEBPACK_IMPORTED_MODULE_3___default()(didStoreComeFromProps || didStoreComeFromContext, "Could not find \"store\" in the context of " + ("\"" + displayName + "\". Either wrap the root component in a <Provider>, ") + "or pass a custom React context provider to <Provider> and the corresponding " + ("React context consumer to " + displayName + " in connect options."));
-      var store = props.store || contextValue.store;
+      invariant__WEBPACK_IMPORTED_MODULE_3___default()(didStoreComeFromProps || didStoreComeFromContext, "Could not find \"store\" in the context of " + ("\"" + displayName + "\". Either wrap the root component in a <Provider>, ") + "or pass a custom React context provider to <Provider> and the corresponding " + ("React context consumer to " + displayName + " in connect options.")); // Based on the previous check, one of these must be true
+
+      var store = didStoreComeFromProps ? props.store : contextValue.store;
       var childPropsSelector = Object(react__WEBPACK_IMPORTED_MODULE_4__["useMemo"])(function () {
         // The child props selector needs the store reference as an input.
         // Re-create this selector whenever the store changes.
@@ -2985,7 +2981,7 @@ _ref) {
       // about useLayoutEffect in SSR, so we try to detect environment and fall back to
       // just useEffect instead to avoid the warning, since neither will run anyway.
 
-      useIsomorphicLayoutEffect(function () {
+      Object(_utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_7__["useIsomorphicLayoutEffect"])(function () {
         // We want to capture the wrapper props and child props we used for later comparisons
         lastWrapperProps.current = wrapperProps;
         lastChildProps.current = actualChildProps;
@@ -2997,7 +2993,7 @@ _ref) {
         }
       }); // Our re-subscribe logic only runs when the store/subscription setup changes
 
-      useIsomorphicLayoutEffect(function () {
+      Object(_utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_7__["useIsomorphicLayoutEffect"])(function () {
         // If we're not subscribed to the store, nothing to do here
         if (!shouldHandleStateChanges) return; // Capture values for checking if and when this component unmounts
 
@@ -3044,7 +3040,6 @@ _ref) {
             forceComponentUpdateDispatch({
               type: 'STORE_UPDATED',
               payload: {
-                latestStoreState: latestStoreState,
                 error: error
               }
             });
@@ -3688,21 +3683,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var invariant__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(invariant__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _useReduxContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./useReduxContext */ "./node_modules/react-redux/es/hooks/useReduxContext.js");
 /* harmony import */ var _utils_Subscription__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Subscription */ "./node_modules/react-redux/es/utils/Subscription.js");
-/* harmony import */ var _components_Context__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/Context */ "./node_modules/react-redux/es/components/Context.js");
+/* harmony import */ var _utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/useIsomorphicLayoutEffect */ "./node_modules/react-redux/es/utils/useIsomorphicLayoutEffect.js");
+/* harmony import */ var _components_Context__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/Context */ "./node_modules/react-redux/es/components/Context.js");
 
 
 
 
- // React currently throws a warning when using useLayoutEffect on the server.
-// To get around it, we can conditionally useEffect on the server (no-op) and
-// useLayoutEffect in the browser. We need useLayoutEffect to ensure the store
-// subscription callback always has the selector from the latest render commit
-// available, otherwise a store update may happen between render and the effect,
-// which may cause missed updates; we also must ensure the store subscription
-// is created synchronously, otherwise a store update may occur before the
-// subscription is created and an inconsistent state may be observed
 
-var useIsomorphicLayoutEffect = typeof window !== 'undefined' ? react__WEBPACK_IMPORTED_MODULE_0__["useLayoutEffect"] : react__WEBPACK_IMPORTED_MODULE_0__["useEffect"];
+
 
 var refEquality = function refEquality(a, b) {
   return a === b;
@@ -3729,7 +3717,7 @@ function useSelectorWithStoreAndSubscription(selector, equalityFn, store, contex
       selectedState = latestSelectedState.current;
     }
   } catch (err) {
-    var errorMessage = "An error occured while selecting the store state: " + err.message + ".";
+    var errorMessage = "An error occurred while selecting the store state: " + err.message + ".";
 
     if (latestSubscriptionCallbackError.current) {
       errorMessage += "\nThe error may be correlated with this previous error:\n" + latestSubscriptionCallbackError.current.stack + "\n\nOriginal stack trace:";
@@ -3738,12 +3726,12 @@ function useSelectorWithStoreAndSubscription(selector, equalityFn, store, contex
     throw new Error(errorMessage);
   }
 
-  useIsomorphicLayoutEffect(function () {
+  Object(_utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_4__["useIsomorphicLayoutEffect"])(function () {
     latestSelector.current = selector;
     latestSelectedState.current = selectedState;
     latestSubscriptionCallbackError.current = undefined;
   });
-  useIsomorphicLayoutEffect(function () {
+  Object(_utils_useIsomorphicLayoutEffect__WEBPACK_IMPORTED_MODULE_4__["useIsomorphicLayoutEffect"])(function () {
     function checkForUpdates() {
       try {
         var newSelectedState = latestSelector.current(store.getState());
@@ -3783,10 +3771,10 @@ function useSelectorWithStoreAndSubscription(selector, equalityFn, store, contex
 
 function createSelectorHook(context) {
   if (context === void 0) {
-    context = _components_Context__WEBPACK_IMPORTED_MODULE_4__["ReactReduxContext"];
+    context = _components_Context__WEBPACK_IMPORTED_MODULE_5__["ReactReduxContext"];
   }
 
-  var useReduxContext = context === _components_Context__WEBPACK_IMPORTED_MODULE_4__["ReactReduxContext"] ? _useReduxContext__WEBPACK_IMPORTED_MODULE_2__["useReduxContext"] : function () {
+  var useReduxContext = context === _components_Context__WEBPACK_IMPORTED_MODULE_5__["ReactReduxContext"] ? _useReduxContext__WEBPACK_IMPORTED_MODULE_2__["useReduxContext"] : function () {
     return Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(context);
   };
   return function useSelector(selector, equalityFn) {
@@ -4174,6 +4162,32 @@ function shallowEqual(objA, objB) {
 
   return true;
 }
+
+/***/ }),
+
+/***/ "./node_modules/react-redux/es/utils/useIsomorphicLayoutEffect.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/react-redux/es/utils/useIsomorphicLayoutEffect.js ***!
+  \************************************************************************/
+/*! exports provided: useIsomorphicLayoutEffect */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useIsomorphicLayoutEffect", function() { return useIsomorphicLayoutEffect; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+ // React currently throws a warning when using useLayoutEffect on the server.
+// To get around it, we can conditionally useEffect on the server (no-op) and
+// useLayoutEffect in the browser. We need useLayoutEffect to ensure the store
+// subscription callback always has the selector from the latest render commit
+// available, otherwise a store update may happen between render and the effect,
+// which may cause missed updates; we also must ensure the store subscription
+// is created synchronously, otherwise a store update may occur before the
+// subscription is created and an inconsistent state may be observed
+
+var isHopefullyDomEnvironment = typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.createElement !== 'undefined';
+var useIsomorphicLayoutEffect = isHopefullyDomEnvironment ? react__WEBPACK_IMPORTED_MODULE_0__["useLayoutEffect"] : react__WEBPACK_IMPORTED_MODULE_0__["useEffect"];
 
 /***/ }),
 
@@ -5520,7 +5534,7 @@ function parse (str, options) {
  * @return {!function(Object=, Object=)}
  */
 function compile (str, options) {
-  return tokensToFunction(parse(str, options))
+  return tokensToFunction(parse(str, options), options)
 }
 
 /**
@@ -5550,14 +5564,14 @@ function encodeAsterisk (str) {
 /**
  * Expose a method for transforming tokens into the path function.
  */
-function tokensToFunction (tokens) {
+function tokensToFunction (tokens, options) {
   // Compile all the tokens into regexps.
   var matches = new Array(tokens.length)
 
   // Compile all the patterns before compilation.
   for (var i = 0; i < tokens.length; i++) {
     if (typeof tokens[i] === 'object') {
-      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$')
+      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$', flags(options))
     }
   }
 
@@ -5670,7 +5684,7 @@ function attachKeys (re, keys) {
  * @return {string}
  */
 function flags (options) {
-  return options.sensitive ? '' : 'i'
+  return options && options.sensitive ? '' : 'i'
 }
 
 /**
@@ -6004,7 +6018,7 @@ function createStore(reducer, preloadedState, enhancer) {
     }
 
     if (isDispatching) {
-      throw new Error('You may not call store.subscribe() while the reducer is executing. ' + 'If you would like to be notified after the store has been updated, subscribe from a ' + 'component and invoke store.getState() in the callback to access the latest state. ' + 'See https://redux.js.org/api-reference/store#subscribe(listener) for more details.');
+      throw new Error('You may not call store.subscribe() while the reducer is executing. ' + 'If you would like to be notified after the store has been updated, subscribe from a ' + 'component and invoke store.getState() in the callback to access the latest state. ' + 'See https://redux.js.org/api-reference/store#subscribelistener for more details.');
     }
 
     var isSubscribed = true;
@@ -6016,13 +6030,14 @@ function createStore(reducer, preloadedState, enhancer) {
       }
 
       if (isDispatching) {
-        throw new Error('You may not unsubscribe from a store listener while the reducer is executing. ' + 'See https://redux.js.org/api-reference/store#subscribe(listener) for more details.');
+        throw new Error('You may not unsubscribe from a store listener while the reducer is executing. ' + 'See https://redux.js.org/api-reference/store#subscribelistener for more details.');
       }
 
       isSubscribed = false;
       ensureCanMutateNextListeners();
       var index = nextListeners.indexOf(listener);
       nextListeners.splice(index, 1);
+      currentListeners = null;
     };
   }
   /**
@@ -6324,6 +6339,7 @@ function combineReducers(reducers) {
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
     }
 
+    hasChanged = hasChanged || finalReducerKeys.length !== Object.keys(state).length;
     return hasChanged ? nextState : state;
   };
 }
@@ -7418,6 +7434,7 @@ var Admin_1 = __importDefault(__webpack_require__(/*! ./Admin */ "./src/ManagerP
 var PreSoaking_1 = __importDefault(__webpack_require__(/*! ./Parameters/PreSoaking */ "./src/ManagerPanel/Parameters/PreSoaking.tsx"));
 var AutoMode_1 = __importDefault(__webpack_require__(/*! ./Parameters/AutoMode */ "./src/ManagerPanel/Parameters/AutoMode.tsx"));
 var Predict_1 = __importDefault(__webpack_require__(/*! ./Parameters/Predict */ "./src/ManagerPanel/Parameters/Predict.tsx"));
+var Wifi_1 = __webpack_require__(/*! ./Wifi */ "./src/ManagerPanel/Wifi.tsx");
 function Panel() {
     return (React.createElement(React.Fragment, null,
         React.createElement(react_router_dom_1.Route, { exact: true, path: "/", component: Root_1.default }),
@@ -7425,6 +7442,7 @@ function Panel() {
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings", component: SettingsIndex_1.default }),
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile", component: Profile_1.default }),
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/color", component: ColorHot_1.default }),
+        React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/wifi", component: Wifi_1.Wifi }),
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/update", component: Update_1.default }),
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand", component: ParametersSettings_1.default }),
         React.createElement(react_router_dom_1.Route, { exact: true, path: "*/settings/profile/hand/steam", component: Steam_1.default }),
@@ -7966,14 +7984,17 @@ var React = __importStar(__webpack_require__(/*! react */ "react"));
 var index_1 = __importDefault(__webpack_require__(/*! ../SettingsStore/index */ "./src/SettingsStore/index.ts"));
 var index_2 = __webpack_require__(/*! ../actions/index */ "./src/actions/index.ts");
 var types_1 = __webpack_require__(/*! ../types */ "./src/types.ts");
+var userProfileName = 'Пользовательские';
 function ProfileView(opts) {
     return (React.createElement("div", { className: 'setting__profile panel_root' },
-        React.createElement("ul", { className: 'setting__profile-list list-group list-group-flush' }, opts.profiles.map(function (el, key) {
+        React.createElement("ul", { className: 'list__root' }, opts.profiles.map(function (el, key) {
             return (React.createElement("li", { onClick: function () {
                     index_1.default.dispatch(index_2.setProfile(el.title));
                 }, className: 'list-group-item' + (el.title === opts.choosenProfile ? ' list-group-item__selected' : ''), key: key }, el.title));
         })),
-        React.createElement(react_router_dom_1.NavLink, { to: 'profile/hand', className: 'manager-panel__block btn-outline-dark' }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430 \u043F\u043E \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u0430\u043C"),
+        React.createElement(react_router_dom_1.NavLink, { onClick: function () {
+                index_1.default.dispatch(index_2.setProfile(userProfileName));
+            }, to: 'profile/hand', className: 'manager-panel__block btn-outline-dark' }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430 \u043F\u043E \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u0430\u043C"),
         React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block btn-outline-success' }, "\u041D\u0430\u0437\u0430\u0434")));
 }
 exports.default = ProfileView;
@@ -8048,6 +8069,7 @@ function RootView(props) {
             " C"),
         React.createElement("div", { className: "manager-panel__block btn-outline-dark manager-panel__topright" },
             React.createElement("b", null, "\u0413\u0440\u0443\u043F\u043F\u0430 2"),
+            React.createElement("br", null),
             "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430: ",
             props.machine[Converter_1.StmMessages.Group2Temperature],
             " ",
@@ -8103,10 +8125,11 @@ var React = __importStar(__webpack_require__(/*! react */ "react"));
 var types_1 = __webpack_require__(/*! ../types */ "./src/types.ts");
 function Setting() {
     return (React.createElement("div", { className: 'setting__root panel_root' },
-        React.createElement(react_router_dom_1.NavLink, { to: 'settings/profile', className: 'manager-panel__block btn-outline-dark' }, "\u0412\u044B\u0431\u043E\u0440 \u043F\u0440\u043E\u0444\u0438\u043B\u044F"),
-        React.createElement(react_router_dom_1.NavLink, { to: 'settings/color', className: 'manager-panel__block btn-outline-dark' }, "\u0426\u0432\u0435\u0442\u043E\u0432\u0430\u044F \u0441\u0445\u0435\u043C\u0430"),
-        React.createElement(react_router_dom_1.NavLink, { to: 'settings/update', className: 'manager-panel__block btn-outline-dark' }, "\u041E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0435"),
-        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block btn-outline-success' }, "\u041D\u0430\u0437\u0430\u0434")));
+        React.createElement(react_router_dom_1.NavLink, { to: 'settings/profile', className: 'manager-panel__block manager-panel__topleft' }, "\u0412\u044B\u0431\u043E\u0440 \u043F\u0440\u043E\u0444\u0438\u043B\u044F"),
+        React.createElement(react_router_dom_1.NavLink, { to: 'settings/wifi', className: 'manager-panel__block manager-panel__topmiddle' }, "Wi-Fi"),
+        React.createElement(react_router_dom_1.NavLink, { to: 'settings/color', className: 'manager-panel__block manager-panel__bottommleft' }, "\u0426\u0432\u0435\u0442\u043E\u0432\u0430\u044F \u0441\u0445\u0435\u043C\u0430"),
+        React.createElement(react_router_dom_1.NavLink, { to: 'settings/update', className: 'manager-panel__block manager-panel__bottommiddle' }, "\u041E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0435"),
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block manager-panel__right' }, "\u041D\u0430\u0437\u0430\u0434")));
 }
 exports.default = Setting;
 
@@ -8129,20 +8152,237 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_router_dom_1 = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 var React = __importStar(__webpack_require__(/*! react */ "react"));
 var types_1 = __webpack_require__(/*! ../types */ "./src/types.ts");
+var index_1 = __importDefault(__webpack_require__(/*! ../SettingsStore/index */ "./src/SettingsStore/index.ts"));
+var actions_1 = __webpack_require__(/*! ../actions */ "./src/actions/index.ts");
 function Update(props) {
     return (React.createElement("div", { className: "asdasd" },
         React.createElement("div", { className: 'manager-panel__update panel_root' },
             React.createElement("div", { className: "manager-panel__block manager-panel__left btn-outline-dark manager-panel__info" },
                 React.createElement("b", null, "\u0412 \u043F\u0440\u043E\u0446\u0435\u0441\u0441\u0435 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u0444\u0443\u043D\u043A\u0446\u0438\u043E\u043D\u0430\u043B \u043A\u043E\u0444\u0435\u043C\u0430\u0448\u0438\u043D\u044B \u0431\u0443\u0434\u0435\u0442 \u043D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D. \u041E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0435 \u043C\u043E\u0436\u0435\u0442 \u0437\u0430\u043D\u044F\u0442\u044C \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u043C\u0438\u043D\u0443\u0442. \u0412\u043E \u0432\u0440\u0435\u043C\u044F \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u043D\u0435\u043B\u044C\u0437\u044F \u043E\u0442\u043A\u043B\u044E\u0447\u0430\u0442\u044C \u043A\u043E\u0444\u0435\u043C\u0430\u0448\u0438\u043D\u0443 \u043E\u0442 \u0441\u0435\u0442\u0438.")),
             React.createElement("div", { className: 'manager-panel__block manager-panel__topright btn-outline-dark' },
-                React.createElement("a", { href: "/update" }, "\u041D\u0430\u0447\u0430\u0442\u044C \u043F\u0440\u043E\u0446\u0435\u0441\u0441 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F")),
+                React.createElement("a", { onClick: function () {
+                        index_1.default.dispatch(actions_1.update());
+                    }, href: "/" }, "\u041D\u0430\u0447\u0430\u0442\u044C \u043F\u0440\u043E\u0446\u0435\u0441\u0441 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F")),
             React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block btn-outline-dark manager-panel__bottomright' }, "\u041D\u0430\u0437\u0430\u0434"))));
 }
 exports.default = Update;
+
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/WIfi/Input.tsx":
+/*!*****************************************!*\
+  !*** ./src/ManagerPanel/WIfi/Input.tsx ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importStar(__webpack_require__(/*! react */ "react"));
+__webpack_require__(/*! ./Keyboard.less */ "./src/ManagerPanel/WIfi/Keyboard.less");
+var Key_1 = __webpack_require__(/*! ./Key */ "./src/ManagerPanel/WIfi/Key.tsx");
+exports.Input = function (props) {
+    var _a = react_1.useState(false), focused = _a[0], setFocused = _a[1];
+    var _b = react_1.useState(false), shift = _b[0], setShift = _b[1];
+    return (react_1.default.createElement("div", { className: focused ? 'input__fullscreen' : '' },
+        react_1.default.createElement("input", { value: props.value, placeholder: props.placeholder, className: props.className, onChange: function (e) { return props.onChange(e.target.value); }, onFocus: function () {
+                setFocused(true);
+            } }),
+        focused && react_1.default.createElement("div", { className: "keyboard" },
+            react_1.default.createElement("div", { className: "keyboard_row" },
+                react_1.default.createElement("div", { className: "key", onClick: function () { return setFocused(false); } }, "Close keyboard"),
+                react_1.default.createElement("div", { className: "key", onClick: function () { return setShift(!shift); } }, "SHIFT"),
+                react_1.default.createElement("div", { className: "key", onClick: function () {
+                        var value = props.value.length > 0 ? props.value.slice(0, -1) : props.value;
+                        props.onChange(value);
+                    } }, "Backspace")),
+            react_1.default.createElement("div", { className: "keyboard_row" },
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "1", shiftsymb: "!", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "2", shiftsymb: "@", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "3", shiftsymb: "#", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "4", shiftsymb: "$", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "5", shiftsymb: "%", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "6", shiftsymb: "^", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "7", shiftsymb: "&", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "8", shiftsymb: "*", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "9", shiftsymb: "(", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "0", shiftsymb: ")", onClick: function (value) { return props.onChange(props.value + value); } })),
+            react_1.default.createElement("div", { className: "keyboard_row" },
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "q", shiftsymb: "Q", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "w", shiftsymb: "W", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "e", shiftsymb: "E", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "r", shiftsymb: "R", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "t", shiftsymb: "T", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "y", shiftsymb: "Y", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "u", shiftsymb: "U", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "i", shiftsymb: "I", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "o", shiftsymb: "O", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "p", shiftsymb: "P", onClick: function (value) { return props.onChange(props.value + value); } })),
+            react_1.default.createElement("div", { className: "keyboard_row" },
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "a", shiftsymb: "A", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "s", shiftsymb: "S", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "d", shiftsymb: "D", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "f", shiftsymb: "F", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "g", shiftsymb: "G", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "h", shiftsymb: "H", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "j", shiftsymb: "J", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "k", shiftsymb: "K", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "l", shiftsymb: "L", onClick: function (value) { return props.onChange(props.value + value); } })),
+            react_1.default.createElement("div", { className: "keyboard_row" },
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "z", shiftsymb: "Z", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "x", shiftsymb: "X", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "c", shiftsymb: "C", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "v", shiftsymb: "V", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "b", shiftsymb: "B", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "n", shiftsymb: "N", onClick: function (value) { return props.onChange(props.value + value); } }),
+                react_1.default.createElement(Key_1.Key, { shift: shift, symb: "m", shiftsymb: "M", onClick: function (value) { return props.onChange(props.value + value); } })))));
+};
+
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/WIfi/Key.tsx":
+/*!***************************************!*\
+  !*** ./src/ManagerPanel/WIfi/Key.tsx ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importDefault(__webpack_require__(/*! react */ "react"));
+__webpack_require__(/*! ./Keyboard.less */ "./src/ManagerPanel/WIfi/Keyboard.less");
+exports.Key = function (props) {
+    return (react_1.default.createElement("div", { className: "key", onClick: function () { return props.onClick(props.shift ? props.shiftsymb : props.symb); } }, props.shift ? props.shiftsymb : props.symb));
+};
+
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/WIfi/Keyboard.less":
+/*!*********************************************!*\
+  !*** ./src/ManagerPanel/WIfi/Keyboard.less ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/WIfi/WifiPanel.less":
+/*!**********************************************!*\
+  !*** ./src/ManagerPanel/WIfi/WifiPanel.less ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+
+/***/ "./src/ManagerPanel/Wifi.tsx":
+/*!***********************************!*\
+  !*** ./src/ManagerPanel/Wifi.tsx ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_router_dom_1 = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+var react_1 = __importStar(__webpack_require__(/*! react */ "react"));
+var types_1 = __webpack_require__(/*! ../types */ "./src/types.ts");
+var SettingsStore_1 = __importDefault(__webpack_require__(/*! ../SettingsStore */ "./src/SettingsStore/index.ts"));
+var react_redux_1 = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+var actions_1 = __webpack_require__(/*! ../actions */ "./src/actions/index.ts");
+var NetChecker_1 = __webpack_require__(/*! ../actions/NetChecker */ "./src/actions/NetChecker.ts");
+var Input_1 = __webpack_require__(/*! ./WIfi/Input */ "./src/ManagerPanel/WIfi/Input.tsx");
+__webpack_require__(/*! ./WIfi/WifiPanel.less */ "./src/ManagerPanel/WIfi/WifiPanel.less");
+function WifiView(opts) {
+    var _a = react_1.useState(null), choosenNetwork = _a[0], setChoosenNetwork = _a[1];
+    var _b = react_1.useState(false), netStatus = _b[0], setNetStatus = _b[1];
+    var _c = react_1.useState(''), pass = _c[0], setPass = _c[1];
+    var interval;
+    react_1.useEffect(function () {
+        interval = window.setInterval(function () {
+            NetChecker_1.checkConnection().then(function (res) {
+                setNetStatus(res);
+            });
+        }, 5000);
+        return function () {
+            clearInterval(interval);
+        };
+    }, []);
+    return (react_1.default.createElement("div", { className: 'wifi__root' },
+        react_1.default.createElement("ul", { className: 'wifiPanel__list' }, opts.availableWifiNets.map(function (el, key) {
+            return (react_1.default.createElement("li", { className: 'list-group-item' + (el.ssid === choosenNetwork ? ' list-group-item__selected' : ''), onClick: function () {
+                    setChoosenNetwork(el.ssid);
+                }, key: key },
+                el.ssid,
+                " ",
+                (opts.wifiStatus.wifiStatus === types_1.WIFI_STATUS.CONNECTED && el.ssid === opts.wifiStatus.currentWifiNet.ssid) ? "*" : '',
+                (opts.wifiStatus.wifiStatus === types_1.WIFI_STATUS.CONNECTING && el.ssid === opts.wifiStatus.currentWifiNet.ssid) ? "CONNECTING" : ''));
+        })),
+        react_1.default.createElement("div", { className: "wifiPanel__controls" },
+            react_1.default.createElement("div", { onClick: function () {
+                    if (choosenNetwork) {
+                        SettingsStore_1.default.dispatch(actions_1.connectWifiNet({ ssid: choosenNetwork, password: pass }));
+                    }
+                }, className: 'manager-panel__block manager-panel__topright wifiPanel__controls_button' }, "\u041F\u043E\u0434\u043A\u043B\u044E\u0447\u0438\u0442\u044C\u0441\u044F"),
+            react_1.default.createElement(Input_1.Input, { className: "wifi__password", value: pass, onChange: setPass, placeholder: "\u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u043F\u0430\u0440\u043E\u043B\u044C" }),
+            react_1.default.createElement("div", { className: "wifi__status" },
+                "\u0421\u0442\u0430\u0442\u0443\u0441 \u0441\u0435\u0442\u0438: ",
+                react_1.default.createElement("span", { className: 'wifi__status_indicator ' + (netStatus ? 'wifi__status_indicator-success' : 'wifi__status_indicator-danger') })),
+            react_1.default.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block manager-panel__bottomright wifiPanel__controls_button' }, "\u041D\u0430\u0437\u0430\u0434"))));
+}
+exports.WifiView = WifiView;
+var mapStateToProps = function (state) {
+    return __assign({}, state);
+};
+exports.Wifi = react_redux_1.connect(mapStateToProps)(WifiView);
 
 
 /***/ }),
@@ -8210,6 +8450,20 @@ WebSocketInst.registerCallback(function (data) {
             payload: parsed
         });
     }
+    if (parsed.wifi) {
+        if (parsed.wifi.list) {
+            store.dispatch({
+                type: actionTypes_1.default.wifiListUpdate,
+                payload: parsed.wifi
+            });
+        }
+        else if (parsed.wifi.wifiStatus) {
+            store.dispatch({
+                type: actionTypes_1.default.wifiStatusUpdate,
+                payload: parsed.wifi
+            });
+        }
+    }
 });
 setInterval(function () {
     if (needDump) {
@@ -8223,6 +8477,12 @@ exports.emitSettingsChange = function (payload) {
 };
 exports.emitChoosenProfileChange = function (payload) {
     WebSocketInst.send(JSON.stringify({ profile: payload }));
+};
+exports.emitConnectToWifi = function (payload) {
+    WebSocketInst.send(JSON.stringify({ wifi: payload }));
+};
+exports.emitUpdate = function () {
+    WebSocketInst.send(JSON.stringify({ update: true }));
 };
 exports.emitStm = function (payload, waitEcho) {
     //console.log("Message emitted " + JSON.stringify(payload));
@@ -8256,6 +8516,35 @@ setTimeout(function () {
     }, 50);
 }, 5000);
 exports.default = store;
+
+
+/***/ }),
+
+/***/ "./src/actions/NetChecker.ts":
+/*!***********************************!*\
+  !*** ./src/actions/NetChecker.ts ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function checkConnection() {
+    return new Promise(function (resolve) {
+        fetch('https://ifconfig.me/').then(function (res) {
+            if (res.ok) {
+                resolve(true);
+            }
+            else {
+                resolve(false);
+            }
+        }).catch(function () {
+            resolve(false);
+        });
+    });
+}
+exports.checkConnection = checkConnection;
 
 
 /***/ }),
@@ -8439,6 +8728,10 @@ var ACTION_TYPES;
     ACTION_TYPES["currentInfoUpdate"] = "currentInfoUpdate";
     ACTION_TYPES["updateSettings"] = "updateSettings";
     ACTION_TYPES["settingsProfilesInitialize"] = "settingsProfilesInitialize";
+    ACTION_TYPES["wifiListUpdate"] = "wifiListUpdate";
+    ACTION_TYPES["connectingWifi"] = "connectingWifi";
+    ACTION_TYPES["wifiStatusUpdate"] = "wifiStatusUpdate";
+    ACTION_TYPES["needUpdate"] = "needUpdate";
 })(ACTION_TYPES || (ACTION_TYPES = {}));
 ;
 exports.default = ACTION_TYPES;
@@ -8473,6 +8766,16 @@ function setProfile(payload) {
 }
 exports.setProfile = setProfile;
 ;
+function connectWifiNet(payload) {
+    SettingsStore_1.emitConnectToWifi(payload);
+    return { type: actionTypes_1.default.connectingWifi, payload: payload };
+}
+exports.connectWifiNet = connectWifiNet;
+function update() {
+    SettingsStore_1.emitUpdate();
+    return { type: actionTypes_1.default.needUpdate, payload: 'update' };
+}
+exports.update = update;
 
 
 /***/ }),
@@ -8955,6 +9258,13 @@ setTemp, trend) { return function (state, commands, changeStatus) {
             }
             var current = Date.now();
             if (current - state.stepStart > state.waitWarmTimeout) {
+                state.step = '2';
+                state.stepStart = Date.now();
+            }
+            break;
+        case '2':
+            var current2 = Date.now();
+            if (current2 - state.stepStart > 500) {
                 state.step = '0';
             }
             break;
@@ -8984,20 +9294,20 @@ setTemp, trend) { return function (state, commands, changeStatus) {
                 }
                 else if (e < 0) {
                     state.power = state.power / 2;
-                    if (state.power < 1000) {
+                    if (state.power < 300) {
                         state.power = 0;
                         state.waitWarmTimeout = 500;
                     }
                     else {
-                        state.waitWarmTimeout = state.power > 5000 ? 5000 : state.power;
+                        state.waitWarmTimeout = state.power > 700 ? 700 : state.power;
                     }
                 }
                 else if (e < 1) {
                     state.power = state.power / 2;
-                    if (state.power < 800) {
-                        state.power = 800;
+                    if (state.power < 500) {
+                        state.power = 500;
                     }
-                    state.waitWarmTimeout = state.power > 5000 ? 5000 : state.power;
+                    state.waitWarmTimeout = state.power > 1000 ? 1000 : state.power;
                 }
                 else {
                     if (state.power < 1000) {
@@ -9500,6 +9810,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 var actionTypes_1 = __importDefault(__webpack_require__(/*! ../actions/actionTypes */ "./src/actions/actionTypes.ts"));
+var types_1 = __webpack_require__(/*! ../types */ "./src/types.ts");
 var Converter_1 = __importStar(__webpack_require__(/*! ../../server/stm/Converter */ "./server/stm/Converter.ts"));
 var validate_1 = __webpack_require__(/*! ./validate */ "./src/reducers/validate.ts");
 var initialStandartProfile = {
@@ -9578,7 +9889,11 @@ var initialState = {
         _a),
     settings: initialStandartProfile.settings,
     choosenProfile: initialStandartProfileName,
-    profiles: [initialStandartProfile]
+    profiles: [initialStandartProfile],
+    availableWifiNets: [],
+    wifiStatus: {
+        wifiStatus: types_1.WIFI_STATUS.NOT_CONNECTED
+    }
 };
 function getChanges(source) {
     var changes = [];
@@ -9712,6 +10027,10 @@ function rootReducer(state, action) {
                 state.choosenProfile = action.payload;
                 currentProfileIndex = getCurrentProfileIndex(state);
                 return __assign(__assign({}, state), { settings: __assign({}, state.profiles[currentProfileIndex].settings) });
+            case actionTypes_1.default.wifiStatusUpdate:
+                return __assign(__assign({}, state), { wifiStatus: __assign({}, action.payload) });
+            case actionTypes_1.default.wifiListUpdate:
+                return __assign(__assign({}, state), { availableWifiNets: action.payload.list });
         }
     }
     catch (e) {
@@ -9773,6 +10092,12 @@ var ProcessStatus;
     ProcessStatus["error"] = "error";
     ProcessStatus["stopped"] = "stopped";
 })(ProcessStatus = exports.ProcessStatus || (exports.ProcessStatus = {}));
+var WIFI_STATUS;
+(function (WIFI_STATUS) {
+    WIFI_STATUS[WIFI_STATUS["NOT_CONNECTED"] = 0] = "NOT_CONNECTED";
+    WIFI_STATUS[WIFI_STATUS["CONNECTING"] = 1] = "CONNECTING";
+    WIFI_STATUS[WIFI_STATUS["CONNECTED"] = 2] = "CONNECTED";
+})(WIFI_STATUS = exports.WIFI_STATUS || (exports.WIFI_STATUS = {}));
 function getBackLink() {
     return location.pathname
         .split("/")

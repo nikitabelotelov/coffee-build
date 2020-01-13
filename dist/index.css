@@ -81,6 +81,11 @@ html {
   background: #6610f2;
   color: #ffffff;
 }
+.manager-panel__right {
+  grid-area: right;
+  background: #6610f2;
+  color: #ffffff;
+}
 .manager-panel__top {
   grid-area: top;
   background: #6610f2;
@@ -93,8 +98,15 @@ html {
 }
 .setting__root {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
+  grid-template-areas: "topleft topmiddle right" "bottomleft bottommiddle right";
+}
+.wifi__root {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: "list topright" "list bottomright";
 }
 .setting__profile {
   display: grid;
@@ -104,6 +116,15 @@ html {
 }
 .setting__profile-list {
   grid-area: list;
+}
+.list__root {
+  grid-area: list;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding-left: 0;
+  margin-bottom: 0;
 }
 .list-group-item__selected {
   color: #6610f2;
@@ -153,6 +174,89 @@ html {
 }
 .admin__text {
   text-align: left;
+}
+
+.input__fullscreen {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 1000;
+  background: #ffffff;
+}
+.keyboard {
+  display: flex;
+  flex-direction: column;
+}
+.keyboard_row {
+  display: flex;
+  flex-direction: row;
+}
+.key {
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid #000000;
+  border-radius: 3px;
+  margin: 2px;
+}
+.key:active {
+  background-color: #CCCCCC;
+}
+
+.wifiPanel__list {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin-bottom: 0;
+  width: 70%;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 0;
+}
+.wifiPanel__controls {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin-bottom: 0;
+  width: 30%;
+  height: 100%;
+  padding: 5px;
+}
+.wifiPanel__controls_button {
+  font-size: 12px;
+}
+.wifi__password {
+  width: 130px;
+  font-size: 15px;
+}
+.wifi__root {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow-y: hidden;
+}
+.wifi__status {
+  display: flex;
+  align-items: center;
+}
+.wifi__status_indicator {
+  height: 15px;
+  width: 15px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 5px;
+}
+.wifi__status_indicator-danger {
+  background-color: #f55;
+}
+.wifi__status_indicator-warning {
+  background-color: #ff5;
+}
+.wifi__status_indicator-success {
+  background-color: #5f5;
 }
 
 
