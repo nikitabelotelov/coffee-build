@@ -8059,7 +8059,6 @@ function RootView(props) {
         React.createElement("div", { className: "manager-panel__block manager-panel__topleft " },
             React.createElement("b", null, "\u0413\u0440\u0443\u043F\u043F\u0430 1"),
             React.createElement("br", null),
-            "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430: ",
             tg1,
             " C /",
             " ",
@@ -8068,19 +8067,14 @@ function RootView(props) {
         React.createElement("div", { className: "manager-panel__block manager-panel__topright" },
             React.createElement("b", null, "\u0413\u0440\u0443\u043F\u043F\u0430 2"),
             React.createElement("br", null),
-            "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430: ",
-            props.machine[Converter_1.StmMessages.Group2Temperature],
-            " ",
             tg2,
             " C /",
             " ",
             props.settings.Group2Temperature,
-            " C P = ",
-            props.machine[Converter_1.StmMessages.Group2Pressure]),
+            " C"),
         React.createElement(react_router_dom_1.NavLink, { to: "/admin", className: "manager-panel__block manager-panel__middleright" },
             React.createElement("b", null, "\u041F\u0440\u0435\u0434\u043D\u0430\u0433\u0440\u0435\u0432\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439"),
             React.createElement("br", null),
-            "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430: ",
             props.machine[Converter_1.StmMessages.PredictGroupTemperature],
             " C"),
         React.createElement("div", { className: "manager-panel__block manager-panel__bottomleft" },
@@ -9774,6 +9768,8 @@ var react_redux_1 = __webpack_require__(/*! react-redux */ "./node_modules/react
 __webpack_require__(/*! ./index.less */ "./src/index.less");
 var App_1 = __importDefault(__webpack_require__(/*! ./App */ "./src/App.tsx"));
 var SettingsStore_1 = __importDefault(__webpack_require__(/*! ./SettingsStore */ "./src/SettingsStore/index.ts"));
+// remove context menu
+window.addEventListener('contextmenu', function (e) { return e.preventDefault(); });
 react_dom_1.default.render(react_1.default.createElement(react_redux_1.Provider, { store: SettingsStore_1.default },
     react_1.default.createElement(App_1.default, null)), document.getElementById('main'));
 
