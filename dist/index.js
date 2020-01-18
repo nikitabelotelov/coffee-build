@@ -9246,7 +9246,7 @@ setTemp, trend) { return function (state, commands, changeStatus) {
     }
     var pressureG = parseInt(machine[pressure], 10) || 0;
     var needTemp = parseInt(settings[setTemp], 10) || 0;
-    if (needTemp < 70 || pressureG < 500) {
+    if (needTemp < 70 || pressureG < 100) {
         return state;
     }
     if (machine[Converter_1.StmMessages.Button1] === '1') {
