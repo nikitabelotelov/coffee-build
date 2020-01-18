@@ -6018,7 +6018,7 @@ function createStore(reducer, preloadedState, enhancer) {
     }
 
     if (isDispatching) {
-      throw new Error('You may not call store.subscribe() while the reducer is executing. ' + 'If you would like to be notified after the store has been updated, subscribe from a ' + 'component and invoke store.getState() in the callback to access the latest state. ' + 'See https://redux.js.org/api-reference/store#subscribelistener for more details.');
+      throw new Error('You may not call store.subscribe() while the reducer is executing. ' + 'If you would like to be notified after the store has been updated, subscribe from a ' + 'component and invoke store.getState() in the callback to access the latest state. ' + 'See https://redux.js.org/api-reference/store#subscribe(listener) for more details.');
     }
 
     var isSubscribed = true;
@@ -6030,14 +6030,13 @@ function createStore(reducer, preloadedState, enhancer) {
       }
 
       if (isDispatching) {
-        throw new Error('You may not unsubscribe from a store listener while the reducer is executing. ' + 'See https://redux.js.org/api-reference/store#subscribelistener for more details.');
+        throw new Error('You may not unsubscribe from a store listener while the reducer is executing. ' + 'See https://redux.js.org/api-reference/store#subscribe(listener) for more details.');
       }
 
       isSubscribed = false;
       ensureCanMutateNextListeners();
       var index = nextListeners.indexOf(listener);
       nextListeners.splice(index, 1);
-      currentListeners = null;
     };
   }
   /**
@@ -6339,7 +6338,6 @@ function combineReducers(reducers) {
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
     }
 
-    hasChanged = hasChanged || finalReducerKeys.length !== Object.keys(state).length;
     return hasChanged ? nextState : state;
   };
 }
@@ -7087,7 +7085,7 @@ var Admin = function (props) {
     var tg1 = Math.round((props.life.tTrendG1.length ? props.life.tTrendG1[props.life.tTrendG1.length - 1].value : 0) * 10) / 10;
     var tg2 = Math.round((props.life.tTrendG2.length ? props.life.tTrendG2[props.life.tTrendG2.length - 1].value : 0) * 10) / 10;
     return (React.createElement("div", { className: 'setting__root panel_root' },
-        React.createElement(react_router_dom_1.NavLink, { to: 'admin/trend', className: 'manager-panel__block btn-outline-dark admin__text' },
+        React.createElement(react_router_dom_1.NavLink, { to: 'admin/trend', className: 'manager-panel__block admin__text' },
             "\u0413\u0440\u0443\u043F\u043F\u0430 1: P = ",
             props.machine[Converter_1.StmMessages.Group1Pressure],
             ", T = ",
@@ -7119,7 +7117,7 @@ var Admin = function (props) {
             React.createElement("br", null),
             "\u0422\u0435\u043D: ",
             props.machine[Converter_1.StmMessages.Relay6]),
-        React.createElement("div", { className: 'manager-panel__block btn-outline-dark admin__text' },
+        React.createElement("div", { className: 'manager-panel__block admin__text' },
             "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u043F\u0430\u0440\u0430: ",
             props.machine[Converter_1.StmMessages.SteamPressure],
             " ",
@@ -7140,7 +7138,7 @@ var Admin = function (props) {
             React.createElement("br", null),
             "\u0422\u0435\u043D \u043F\u0440\u0435\u0434\u043D\u0430\u0433\u0440\u0435\u0432\u0430: ",
             props.machine[Converter_1.StmMessages.Relay3]),
-        React.createElement("div", { className: 'manager-panel__block btn-outline-dark admin__text' },
+        React.createElement("div", { className: 'manager-panel__block admin__text' },
             React.createElement("div", { className: 'admin__buttons' },
                 React.createElement("div", { className: "admin__button" + (props.machine[Converter_1.StmMessages.Button1] === '1' ? " admin__button_active" : "") }, "B1"),
                 React.createElement("div", { className: "admin__button" + (props.machine[Converter_1.StmMessages.Button2] === '1' ? " admin__button_active" : "") }, "B2"),
@@ -7163,7 +7161,7 @@ var Admin = function (props) {
             React.createElement("br", null),
             "Volum2: ",
             props.machine[Converter_1.StmMessages.VolumetricGroup2]),
-        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block btn-outline-success' }, "\u041D\u0430\u0437\u0430\u0434")));
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block ' }, "\u041D\u0430\u0437\u0430\u0434")));
 };
 var mapStateToProps = function (state) {
     return __assign({}, state);
@@ -7379,9 +7377,9 @@ function NumberInput(props) {
         }
     });
     return (React.createElement("div", { className: "setting__input" },
-        React.createElement("button", { onMouseDown: function () { return setStartDec(1); }, onMouseUp: function () { return setStartDec(0); }, onMouseLeave: function () { return setStartDec(0); }, className: "btn-outline-dark setting__inputButton" }, "-"),
+        React.createElement("button", { onMouseDown: function () { return setStartDec(1); }, onMouseUp: function () { return setStartDec(0); }, onMouseLeave: function () { return setStartDec(0); }, className: " setting__inputButton" }, "-"),
         React.createElement("span", { className: "setting__inputValue" }, props.value),
-        React.createElement("button", { onMouseDown: function () { return setStartInc(1); }, onMouseUp: function () { return setStartInc(0); }, onMouseLeave: function () { return setStartInc(0); }, className: "btn-outline-dark setting__inputButton" }, "+")));
+        React.createElement("button", { onMouseDown: function () { return setStartInc(1); }, onMouseUp: function () { return setStartInc(0); }, onMouseLeave: function () { return setStartInc(0); }, className: " setting__inputButton" }, "+")));
 }
 exports.default = NumberInput;
 
@@ -7917,7 +7915,7 @@ function ParametersSettings() {
         React.createElement("ul", { className: "setting__profile-list list-group list-group-flush" }, Parameters.map(function (el) {
             return (React.createElement(react_router_dom_1.NavLink, { to: "hand/" + el.route, className: "setting__hand-listItem list-group-item", key: el.key }, el.title));
         })),
-        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block btn-outline-success" }, "\u041D\u0430\u0437\u0430\u0434")));
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: "manager-panel__block " }, "\u041D\u0430\u0437\u0430\u0434")));
 }
 exports.default = ParametersSettings;
 
@@ -7994,8 +7992,8 @@ function ProfileView(opts) {
         })),
         React.createElement(react_router_dom_1.NavLink, { onClick: function () {
                 index_1.default.dispatch(index_2.setProfile(userProfileName));
-            }, to: 'profile/hand', className: 'manager-panel__block btn-outline-dark' }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430 \u043F\u043E \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u0430\u043C"),
-        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block btn-outline-success' }, "\u041D\u0430\u0437\u0430\u0434")));
+            }, to: 'profile/hand', className: 'manager-panel__block ' }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430 \u043F\u043E \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u0430\u043C"),
+        React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block ' }, "\u041D\u0430\u0437\u0430\u0434")));
 }
 exports.default = ProfileView;
 
@@ -8058,7 +8056,7 @@ function RootView(props) {
     var tg1 = Math.round((props.life.tTrendG1.length ? props.life.tTrendG1[props.life.tTrendG1.length - 1].value : 0) * 10) / 10;
     var tg2 = Math.round((props.life.tTrendG2.length ? props.life.tTrendG2[props.life.tTrendG2.length - 1].value : 0) * 10) / 10;
     return (React.createElement("div", { className: "manager-panel__root panel_root" },
-        React.createElement("div", { className: "manager-panel__block btn-outline-dark manager-panel__topleft " },
+        React.createElement("div", { className: "manager-panel__block manager-panel__topleft " },
             React.createElement("b", null, "\u0413\u0440\u0443\u043F\u043F\u0430 1"),
             React.createElement("br", null),
             "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430: ",
@@ -8067,7 +8065,7 @@ function RootView(props) {
             " ",
             props.settings.Group1Temperature,
             " C"),
-        React.createElement("div", { className: "manager-panel__block btn-outline-dark manager-panel__topright" },
+        React.createElement("div", { className: "manager-panel__block manager-panel__topright" },
             React.createElement("b", null, "\u0413\u0440\u0443\u043F\u043F\u0430 2"),
             React.createElement("br", null),
             "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430: ",
@@ -8079,24 +8077,24 @@ function RootView(props) {
             props.settings.Group2Temperature,
             " C P = ",
             props.machine[Converter_1.StmMessages.Group2Pressure]),
-        React.createElement(react_router_dom_1.NavLink, { to: "/admin", className: "manager-panel__block btn-outline-dark manager-panel__middleleft" },
+        React.createElement(react_router_dom_1.NavLink, { to: "/admin", className: "manager-panel__block manager-panel__middleright" },
             React.createElement("b", null, "\u041F\u0440\u0435\u0434\u043D\u0430\u0433\u0440\u0435\u0432\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439"),
             React.createElement("br", null),
             "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430: ",
             props.machine[Converter_1.StmMessages.PredictGroupTemperature],
             " C"),
-        React.createElement("div", { className: "manager-panel__block btn-outline-dark manager-panel__bottomleft" },
+        React.createElement("div", { className: "manager-panel__block manager-panel__bottomleft" },
             React.createElement("b", null, "\u041F\u0430\u0440\u043E\u0432\u043E\u0439"),
+            React.createElement("br", null),
             "\u0423\u0440\u043E\u0432\u0435\u043D\u044C: ",
             props.machine[Converter_1.StmMessages.WaterLevel],
-            " ",
             React.createElement("br", null),
             "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435: ",
             props.machine[Converter_1.StmMessages.SteamPressure],
             " /",
             " ",
             props.settings.SteamPressure),
-        React.createElement(react_router_dom_1.NavLink, { to: "/settings", className: "manager-panel__block btn-outline-dark manager-panel__bottomright" }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438")));
+        React.createElement(react_router_dom_1.NavLink, { to: "/settings", className: "manager-panel__block manager-panel__bottomright" }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438")));
 }
 exports.RootView = RootView;
 
@@ -8165,16 +8163,16 @@ function Update(props) {
     var _a = React.useState(false), isUpdate = _a[0], setIsUpdate = _a[1];
     return (React.createElement("div", { className: "" }, isUpdate ? "Ждем завершения обновления" :
         React.createElement("div", { className: 'manager-panel__update panel_root' },
-            React.createElement("div", { className: "manager-panel__block manager-panel__left btn-outline-dark manager-panel__info" },
+            React.createElement("div", { className: "manager-panel__block manager-panel__left manager-panel__info" },
                 React.createElement("b", null, "\u0412 \u043F\u0440\u043E\u0446\u0435\u0441\u0441\u0435 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u0444\u0443\u043D\u043A\u0446\u0438\u043E\u043D\u0430\u043B \u043A\u043E\u0444\u0435\u043C\u0430\u0448\u0438\u043D\u044B \u0431\u0443\u0434\u0435\u0442 \u043D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D. \u041E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0435 \u043C\u043E\u0436\u0435\u0442 \u0437\u0430\u043D\u044F\u0442\u044C \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u043C\u0438\u043D\u0443\u0442. \u0412\u043E \u0432\u0440\u0435\u043C\u044F \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u043D\u0435\u043B\u044C\u0437\u044F \u043E\u0442\u043A\u043B\u044E\u0447\u0430\u0442\u044C \u043A\u043E\u0444\u0435\u043C\u0430\u0448\u0438\u043D\u0443 \u043E\u0442 \u0441\u0435\u0442\u0438.")),
-            React.createElement("div", { className: 'manager-panel__block manager-panel__topright btn-outline-dark' },
+            React.createElement("div", { className: 'manager-panel__block manager-panel__topright ' },
                 React.createElement("div", { onClick: function () {
                         setIsUpdate(true);
                         // @ts-ignore
                         window.needRefreshGlobal = true;
                         index_1.default.dispatch(actions_1.update());
                     } }, "\u041D\u0430\u0447\u0430\u0442\u044C \u043F\u0440\u043E\u0446\u0435\u0441\u0441 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F")),
-            React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block btn-outline-dark manager-panel__bottomright' }, "\u041D\u0430\u0437\u0430\u0434"))));
+            React.createElement(react_router_dom_1.NavLink, { to: types_1.getBackLink(), className: 'manager-panel__block manager-panel__bottomright' }, "\u041D\u0430\u0437\u0430\u0434"))));
 }
 exports.default = Update;
 
@@ -8351,6 +8349,9 @@ function WifiView(opts) {
     var _c = react_1.useState(''), pass = _c[0], setPass = _c[1];
     var interval;
     react_1.useEffect(function () {
+        NetChecker_1.checkConnection().then(function (res) {
+            setNetStatus(res);
+        });
         interval = window.setInterval(function () {
             NetChecker_1.checkConnection().then(function (res) {
                 setNetStatus(res);
@@ -8477,7 +8478,7 @@ setInterval(function () {
     }
 }, 300);
 exports.emitSettingsChange = function (payload) {
-    WebSocketInst.send(JSON.stringify({ settings: __assign(__assign({}, payload), { profile: 0 }) }));
+    WebSocketInst.send(JSON.stringify({ settings: __assign({}, payload) }));
 };
 exports.emitChoosenProfileChange = function (payload) {
     WebSocketInst.send(JSON.stringify({ profile: payload }));
