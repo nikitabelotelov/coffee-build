@@ -23430,18 +23430,11 @@ var __assign = (this && this.__assign) || function () {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var redux_1 = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
 var index_1 = __importDefault(__webpack_require__(/*! ../reducers/index */ "./src/reducers/index.ts"));
 var WebSocketController_1 = __webpack_require__(/*! ../actions/WebSocketController */ "./src/actions/WebSocketController.ts");
-var Converter_1 = __importStar(__webpack_require__(/*! ../../server/stm/Converter */ "./server/stm/Converter.ts"));
+var Converter_1 = __importDefault(__webpack_require__(/*! ../../server/stm/Converter */ "./server/stm/Converter.ts"));
 var actionTypes_1 = __importDefault(__webpack_require__(/*! ../actions/actionTypes */ "./src/actions/actionTypes.ts"));
 var index_2 = __importDefault(__webpack_require__(/*! ../reducers/index */ "./src/reducers/index.ts"));
 var store = redux_1.createStore(index_1.default);
@@ -23502,32 +23495,6 @@ exports.emitConnectToWifi = function (payload) {
 };
 exports.emitUpdate = function () {
     WebSocketInst.send(JSON.stringify({ update: true }));
-};
-exports.emitStm = function (payload, waitEcho) {
-    //console.log("Message emitted " + JSON.stringify(payload));
-    WebSocketInst.send(JSON.stringify({ stm: Converter_1.default.toString(payload) }));
-    if (waitEcho) {
-        var echoWaiter_1 = function (data) {
-            var parsed = JSON.parse(data);
-            var msg = Converter_1.default.fromString(parsed.stm);
-            if (msg.id === Converter_1.StmMessages.Echo) {
-                var converted = Converter_1.default.fromString(msg.content);
-                // console.log('ECHO:', converted)
-                if (payload.id === converted.id && payload.content === converted.content) {
-                    clearTimeout(echoTimeout_1);
-                }
-                else {
-                    exports.emitStm(payload, true);
-                }
-                WebSocketInst.unRegisterCallback(echoWaiter_1);
-            }
-        };
-        var echoTimeout_1 = setTimeout(function () {
-            exports.emitStm(payload, true);
-            WebSocketInst.unRegisterCallback(echoWaiter_1);
-        }, 1000);
-        WebSocketInst.registerCallback(echoWaiter_1);
-    }
 };
 exports.default = store;
 
