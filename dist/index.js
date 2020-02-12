@@ -23079,6 +23079,7 @@ var Converter_1 = __webpack_require__(/*! ../../server/stm/Converter */ "./serve
 function RootView(props) {
     var tg1 = Math.round((props.life.tTrendG1.length ? props.life.tTrendG1[props.life.tTrendG1.length - 1].value : 0) * 10) / 10;
     var tg2 = Math.round((props.life.tTrendG2.length ? props.life.tTrendG2[props.life.tTrendG2.length - 1].value : 0) * 10) / 10;
+    var realSteam = Math.round((parseFloat(props.machine[Converter_1.StmMessages.SteamPressure]) / 20)) / 10;
     return (React.createElement("div", { className: "manager-panel__root panel_root" },
         React.createElement("div", { className: "manager-panel__block manager-panel__topleft " },
             React.createElement("b", null, "\u0413\u0440\u0443\u043F\u043F\u0430 1"),
@@ -23101,11 +23102,11 @@ function RootView(props) {
             React.createElement("br", null),
             props.machine[Converter_1.StmMessages.PredictGroupTemperature],
             " C"),
-        React.createElement("div", { className: "manager-panel__block manager-panel__bottomleft " + (props.machine[Converter_1.StmMessages.WaterLevel] === '0' ? 'manager-panel__steam-haswater' : '') },
+        React.createElement("div", { className: "manager-panel__block manager-panel__bottomleft " + (props.machine[Converter_1.StmMessages.WaterLevel] === '1' ? 'manager-panel__steam-haswater' : '') },
             React.createElement("b", null, "\u041F\u0430\u0440\u043E\u0432\u043E\u0439"),
             React.createElement("br", null),
             "\u0414\u0430\u0432\u043B\u0435\u043D\u0438\u0435: ",
-            props.machine[Converter_1.StmMessages.SteamPressure],
+            realSteam,
             " /",
             " ",
             props.settings.SteamPressure),
