@@ -23080,6 +23080,8 @@ function RootView(props) {
     var tg1 = Math.round((props.life.tTrendG1.length ? props.life.tTrendG1[props.life.tTrendG1.length - 1].value : 0) * 10) / 10;
     var tg2 = Math.round((props.life.tTrendG2.length ? props.life.tTrendG2[props.life.tTrendG2.length - 1].value : 0) * 10) / 10;
     var realSteam = Math.round((parseFloat(props.machine[Converter_1.StmMessages.SteamPressure]) / 20)) / 10;
+    var pred = parseInt(props.machine[Converter_1.StmMessages.PredictGroupTemperature], 10);
+    var predSet = Number(props.settings.PredictTemperature) || 0;
     return (React.createElement("div", { className: "manager-panel__root panel_root" },
         React.createElement("div", { className: "manager-panel__block manager-panel__topleft " },
             React.createElement("b", null, "\u0413\u0440\u0443\u043F\u043F\u0430 1"),
@@ -23097,7 +23099,7 @@ function RootView(props) {
             " ",
             props.settings.Group2Temperature,
             " C"),
-        React.createElement(react_router_dom_1.NavLink, { to: "/admin", className: "manager-panel__block manager-panel__middleright" },
+        React.createElement(react_router_dom_1.NavLink, { to: "/admin", className: "manager-panel__block manager-panel__middleright1 " + (pred >= predSet ? 'manager-panel__steam-haswater' : '') },
             React.createElement("b", null, "\u041F\u0440\u0435\u0434\u043D\u0430\u0433\u0440\u0435\u0432\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439"),
             React.createElement("br", null),
             props.machine[Converter_1.StmMessages.PredictGroupTemperature],
