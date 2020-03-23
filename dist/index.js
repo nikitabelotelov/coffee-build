@@ -22013,6 +22013,15 @@ var StmCommands;
     StmCommands["SetGreenMachine"] = "a";
     StmCommands["SetBlueMachine"] = "b";
     StmCommands["PackageEnd"] = "c";
+    StmCommands["SetLightButton1"] = "d";
+    StmCommands["SetLightButton2"] = "e";
+    StmCommands["SetLightButton3"] = "f";
+    StmCommands["SetLightButton4"] = "g";
+    StmCommands["SetLightButton5"] = "h";
+    StmCommands["SetLightButton6"] = "j";
+    StmCommands["SetLightButton7"] = "k";
+    StmCommands["SetLightButton8"] = "l";
+    StmCommands["SetLightButton9"] = "m";
 })(StmCommands = exports.StmCommands || (exports.StmCommands = {}));
 /*
 */
