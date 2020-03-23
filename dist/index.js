@@ -21981,6 +21981,7 @@ var StmMessages;
     StmMessages["Button9"] = "H";
     StmMessages["VolumetricGroup1"] = "K";
     StmMessages["VolumetricGroup2"] = "L";
+    StmMessages["PackageEnd"] = "M";
 })(StmMessages = exports.StmMessages || (exports.StmMessages = {}));
 var StmCommands;
 (function (StmCommands) {
@@ -22011,6 +22012,7 @@ var StmCommands;
     StmCommands["SetRedMachine"] = "Z";
     StmCommands["SetGreenMachine"] = "a";
     StmCommands["SetBlueMachine"] = "b";
+    StmCommands["PackageEnd"] = "c";
 })(StmCommands = exports.StmCommands || (exports.StmCommands = {}));
 /*
 */
