@@ -24148,9 +24148,6 @@ function rootReducer(state, action) {
                     return state;
                 }
                 state.machine[action.payload.id] = action.payload.content;
-                if (action.payload.id === Converter_1.StmMessages.Button3) {
-                    console.log('Button3 = ', action.payload.content);
-                }
                 if (action.payload.id === Converter_1.StmMessages.PredictGroupTemperature) {
                     state.machine[action.payload.id] = "" + Math.round(Converter_1.default.voltToCelsium(action.payload.content) * 10) / 10;
                 }
@@ -24227,6 +24224,7 @@ exports.default = rootReducer;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Validate = void 0;
 var Converter_1 = __webpack_require__(/*! ../../server/stm/Converter */ "./server/stm/Converter.ts");
+var checkObject = {};
 exports.Validate = function (id, value) {
     switch (id) {
         case Converter_1.StmMessages.Button1:
@@ -24238,7 +24236,19 @@ exports.Validate = function (id, value) {
         case Converter_1.StmMessages.Button7:
         case Converter_1.StmMessages.Button8:
         case Converter_1.StmMessages.Button9:
-            return (value === '1' || value === '2');
+            if (value === '2') {
+                if (checkObject[id] === true) {
+                    return true;
+                }
+                else {
+                    checkObject[id] = true;
+                    return false;
+                }
+            }
+            else {
+                checkObject[id] = false;
+                return (value === '1');
+            }
         default:
             return true;
     }
