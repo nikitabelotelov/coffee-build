@@ -24148,6 +24148,9 @@ function rootReducer(state, action) {
                     return state;
                 }
                 state.machine[action.payload.id] = action.payload.content;
+                if (action.payload.id === Converter_1.StmMessages.Button3) {
+                    console.log('Button3 = ', action.payload.content);
+                }
                 if (action.payload.id === Converter_1.StmMessages.PredictGroupTemperature) {
                     state.machine[action.payload.id] = "" + Math.round(Converter_1.default.voltToCelsium(action.payload.content) * 10) / 10;
                 }
