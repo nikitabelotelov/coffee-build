@@ -24025,8 +24025,6 @@ var initialState = {
         tTrendG2: [],
         middleTTrendG1: [],
         middleTTrendG2: [],
-        speedG1: 0,
-        speedG2: 0,
         godMod: 0,
     },
     machine: (_a = {},
@@ -24098,27 +24096,6 @@ function CreateMiddleTrend(source) {
     }
     return result;
 }
-var getSpeed = function (source) {
-    var last = source[source.length - 1];
-    var min = source[0];
-    var max = source[0];
-    source.forEach(function (el) {
-        if (el.value < min.value) {
-            min = el;
-        }
-        if (el.value > max.value) {
-            max = el;
-        }
-    });
-    var speed = 0;
-    if (min.time > max.time) {
-        speed = (last.value - min.value) / (last.time - min.time);
-    }
-    else {
-        speed = (last.value - max.value) / (last.time - max.time);
-    }
-    return speed;
-};
 function getCurrentProfileIndex(state) {
     var currentSettings;
     for (var i = 0; i < state.profiles.length; i++) {
@@ -24170,7 +24147,6 @@ function rootReducer(state, action) {
                         state.life.tTrendG1.splice(0, 1);
                         state.life.middleTTrendG1 = CreateMiddleTrend(state.life.tTrendG1);
                         console.log("G1: ", state.life.middleTTrendG1);
-                        state.life.speedG1 = getSpeed(state.life.middleTTrendG1);
                     }
                 }
                 if (action.payload.id === Converter_1.StmMessages.Group2Temperature) {
@@ -24187,7 +24163,6 @@ function rootReducer(state, action) {
                         state.life.tTrendG2.splice(0, 1);
                         state.life.middleTTrendG2 = CreateMiddleTrend(state.life.tTrendG2);
                         console.log("G2: ", state.life.middleTTrendG2);
-                        state.life.speedG2 = getSpeed(state.life.middleTTrendG2);
                     }
                 }
                 return __assign(__assign({}, state), { machine: __assign({}, state.machine), life: __assign({}, state.life) });
