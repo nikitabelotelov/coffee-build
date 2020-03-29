@@ -24169,6 +24169,7 @@ function rootReducer(state, action) {
                     if (state.life.tTrendG1.length > 100) {
                         state.life.tTrendG1.splice(0, 1);
                         state.life.middleTTrendG1 = CreateMiddleTrend(state.life.tTrendG1);
+                        console.log("G1: ", state.life.middleTTrendG1);
                         state.life.speedG1 = getSpeed(state.life.middleTTrendG1);
                     }
                 }
@@ -24185,6 +24186,7 @@ function rootReducer(state, action) {
                     if (state.life.tTrendG2.length > 100) {
                         state.life.tTrendG2.splice(0, 1);
                         state.life.middleTTrendG2 = CreateMiddleTrend(state.life.tTrendG2);
+                        console.log("G2: ", state.life.middleTTrendG2);
                         state.life.speedG2 = getSpeed(state.life.middleTTrendG2);
                     }
                 }
