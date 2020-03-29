@@ -24084,30 +24084,17 @@ function getChanges(source) {
 }
 function CreateMiddleTrend(source) {
     var result = [];
-    var changes = getChanges(source);
-    var middleOfChanges = 0;
-    for (var i = 0; i < changes.length; i++) {
-        middleOfChanges += changes[i];
-    }
-    middleOfChanges /= changes.length;
-    var smooth = __spreadArrays(source);
-    // find impuls
-    for (var i = 1; i < smooth.length - 1; i++) {
-        var current = smooth[i].value;
-        var prev = smooth[i - 1].value;
-        var next = smooth[i + 1].value;
-        if (current < prev && current < next || current > next && current > prev) {
-            if (changes[i] > middleOfChanges) {
-                smooth[i] = { time: smooth[i].time, value: (prev + next) / 2 };
-                changes = getChanges(smooth);
+    var average = source.reduce(function (res, el) { return res + el.value; }, 0) / source.length;
+    for (var i = 0; i < source.length - 1; i++) {
+        var current = source[i];
+        if (Math.abs(current.value - average) > 10) {
+            if (i === 0) {
+                result.push({ value: average, time: current.time });
+            }
+            else {
+                result.push({ value: source[i - 1].value, time: current.time });
             }
         }
-    }
-    for (var i = 1; i < smooth.length - 1; i++) {
-        var current = smooth[i];
-        var prev = smooth[i - 1].value;
-        var next = smooth[i + 1].value;
-        result.push({ value: (current.value + prev + next) / 3, time: current.time });
     }
     return result;
 }
@@ -24171,6 +24158,9 @@ function rootReducer(state, action) {
                 }
                 if (action.payload.id === Converter_1.StmMessages.Group1Temperature) {
                     var temp = Converter_1.default.voltToCelsium(action.payload.content);
+                    if (temp < 50 || temp > 110) {
+                        return state;
+                    }
                     state.life.tTrendG1.push({
                         time: Date.now(),
                         value: temp
@@ -24184,6 +24174,9 @@ function rootReducer(state, action) {
                 }
                 if (action.payload.id === Converter_1.StmMessages.Group2Temperature) {
                     var temp = Converter_1.default.voltToCelsium(action.payload.content);
+                    if (temp < 50 || temp > 110) {
+                        return state;
+                    }
                     state.life.tTrendG2.push({
                         time: Date.now(),
                         value: temp
