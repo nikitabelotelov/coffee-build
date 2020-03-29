@@ -24149,7 +24149,6 @@ function rootReducer(state, action) {
                     if (state.life.tTrendG1.length > 100) {
                         state.life.tTrendG1.splice(0, 1);
                         state.life.middleTTrendG1 = CreateMiddleTrend(state.life.tTrendG1);
-                        console.log("G1: ", state.life.middleTTrendG1);
                     }
                 }
                 if (action.payload.id === Converter_1.StmMessages.Group2Temperature) {
@@ -24165,7 +24164,6 @@ function rootReducer(state, action) {
                     if (state.life.tTrendG2.length > 100) {
                         state.life.tTrendG2.splice(0, 1);
                         state.life.middleTTrendG2 = CreateMiddleTrend(state.life.tTrendG2);
-                        console.log("G2: ", state.life.middleTTrendG2);
                     }
                 }
                 return __assign(__assign({}, state), { machine: __assign({}, state.machine), life: __assign({}, state.life) });
